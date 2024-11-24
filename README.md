@@ -1,6 +1,6 @@
-# e_commerce
+# R store
 
-e-commerce app
+E-Commerce mobile application
 
 ## Getting Started
 
