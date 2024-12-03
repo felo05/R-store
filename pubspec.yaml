@@ -30,12 +30,14 @@ dependencies:
   dio: ^5.6.0
   get: ^4.6.6
   hive: ^2.2.3
+  dartz:
   hive_flutter: ^1.1.0
   carousel_slider:
   water_drop_nav_bar:
   flutter_map: ^4.0.0
   latlong2: ^0.8.1
   geolocator:
+  cached_network_image:
   path_provider_android: ^2.0.13
   flutter_localizations:
 
