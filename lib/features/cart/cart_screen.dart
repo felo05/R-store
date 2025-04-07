@@ -13,20 +13,16 @@ import '../../core/widgets/cart_product_card.dart';
 import '../../core/widgets/custom_text.dart';
 import '../checkout/checkout_screen.dart';
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
-  @override
-  State<CartScreen> createState() => _CartScreenState();
-}
 
-class _CartScreenState extends State<CartScreen> {
-  int total = 0;
-
-  List<CartItem> products = [];
 
   @override
   Widget build(BuildContext context) {
+    int total = 0;
+
+    List<CartItem> products = [];
     return BlocProvider(
       create: (context) => ChangeTotalCubit(),
       child: Scaffold(
@@ -34,7 +30,8 @@ class _CartScreenState extends State<CartScreen> {
         appBar: AppBar(
           title: CustomText(
             text: AppLocalizations.of(context)!.your_cart,
-            textSize: 22,
+            textSize: 24,
+            textColor: baseColor,
             textWeight: FontWeight.bold,
           ),
         ),
@@ -47,7 +44,8 @@ class _CartScreenState extends State<CartScreen> {
             }
 
             if (state is CartSuccessState) {
-              products = state.cartResponse.data?.cartItems ?? [];
+              products = state.cartResponse.cartItems ?? [];
+              total = state.cartResponse.total!.toInt();
               return RefreshIndicator(
                 onRefresh: () async {
                   context.read<CartCubit>().getCart(context);
@@ -72,10 +70,10 @@ class _CartScreenState extends State<CartScreen> {
                       itemBuilder: (context, index) {
                         return CartItemCard(
                           cartItem: products[index],
-                          onRemoveAll: (int total) {
+                          onRemoveAll: (int newTotal) {
                             products.removeAt(index);
-                            this.total -= total;
-                            setState(() {});
+                            total -= newTotal;
+                            context.read<CartCubit>().emitSuccessState(CartData(cartItems: products, total: total));
                             context
                                 .read<ProductsCubit>()
                                 .getProducts(context);
@@ -83,8 +81,8 @@ class _CartScreenState extends State<CartScreen> {
                                 .read<GetFavoriteCubit>()
                                 .getFavorites(context);
                           },
-                          onChange: (int total) {
-                            this.total += total;
+                          onChange: (int newTotal) {
+                            total += newTotal;
                             context.read<ChangeTotalCubit>().changeTotal();
                           },
                         );
@@ -113,7 +111,7 @@ class _CartScreenState extends State<CartScreen> {
         bottomNavigationBar: BlocConsumer<CartCubit, CartState>(
           listener: (context, state) {
             if (state is CartSuccessState) {
-              total = state.cartResponse.data!.total!.toInt();
+              total = state.cartResponse.total!.toInt();
             }
           },
           builder: (context, state) {

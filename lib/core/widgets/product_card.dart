@@ -1,10 +1,13 @@
 import 'package:e_commerce/features//home/cubits/products/products_cubit.dart';
 import 'package:e_commerce/features/favorites/repository/favorites_repository_implementation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
 
+import '../../features/cart/cubit/get_cart/cart_cubit.dart';
+import '../../features/favorites/cubit/get_favorites_cubit/get_favorite_cubit.dart';
 import '../../features/home/models/products_model.dart';
 import '../../features/product_details/product_details_screen.dart';
 import 'custom_network_image.dart';
@@ -93,6 +96,23 @@ class _ProductCardState extends State<ProductCard> {
                               context,
                               widget.isInHome,
                               widget.reloadAll);
+                          if (widget.reloadAll) {
+                            context.read<GetFavoriteCubit>().getFavorites(context);
+                            context.read<ProductsCubit>().getProducts(context);
+                            context.read<CartCubit>().getCart(context);
+                          } else
+                          {
+                            if (widget.isInHome == null) {
+                              context.read<GetFavoriteCubit>().getFavorites(context);
+                              context.read<ProductsCubit>().getProducts(context);
+                            } else if (widget.isInHome!) {
+                              context.read<GetFavoriteCubit>().getFavorites(context);
+                              context.read<CartCubit>().getCart(context);
+                            } else {
+                              context.read<ProductsCubit>().getProducts(context);
+                              context.read<CartCubit>().getCart(context);
+                            }
+                          }
                         },
                       ),
                     ),

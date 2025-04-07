@@ -15,11 +15,14 @@ class CartCubit extends Cubit<CartState> {
     (await CartRepositoryImplementation().getCartProducts(context)).fold((failure){
       emit(CartErrorState(failure.errorMessage.toString()));
     }, (data){
-      emit(CartSuccessState(data));
+
+      emit(CartSuccessState(data.data!));
     });
   }
-
-  static void changeQuantity({required int quantity, required int productId}) async {
+  void emitSuccessState(CartData data){
+    emit(CartSuccessState(data));
+  }
+  static void changeQuantityCloudly({required int quantity, required int productId}) async {
     await DioHelpers.putData(path: "${Kapi.cart}/$productId", body: {
       'quantity': quantity,
     });

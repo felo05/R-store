@@ -15,7 +15,8 @@ class HorizontalProductsHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        CustomText(text: text, textSize: 20, textWeight: FontWeight.bold),
+        CustomText(text: text, textSize: 20, textWeight: FontWeight.bold,
+            textColor: baseColor),
         TextButton(
             onPressed: onPressed,
             child: CustomText(

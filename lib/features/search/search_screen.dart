@@ -63,19 +63,28 @@ class _SearchScreenContent extends StatelessWidget {
               },
               builder: (context, state) {
                 if (state is SearchLoadingState) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return const Column(
+                    children: [SizedBox(height: 150,),
+                      Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
                   );
                 }
                 if (state is SearchSuccessState) {
                   BaseProductData products = state.products;
                   if (products.data!.isEmpty) {
-                    return Center(
-                      child: CustomText(
-                        text: AppLocalizations.of(context)!.no_products_found,
-                        textSize: 26,
-                        textWeight: FontWeight.bold,
-                      ),
+                    return Column(
+                      children: [
+                        SizedBox(height: 150.h),
+                        Center(
+                          child: CustomText(
+                            text: AppLocalizations.of(context)!.no_products_found,
+                            textSize: 26,
+                            textWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     );
                   }
                   return Expanded(

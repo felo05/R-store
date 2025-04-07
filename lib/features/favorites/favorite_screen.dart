@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
 
@@ -19,8 +18,9 @@ class FavoriteScreen extends StatelessWidget {
       appBar: AppBar(
         title: CustomText(
           text: AppLocalizations.of(context)!.favorite_products,
-          textSize: 22,
+          textSize: 24,
           textWeight: FontWeight.bold,
+          textColor: baseColor,
         ),
       ),
       body: BlocConsumer<GetFavoriteCubit, GetFavoriteState>(
@@ -54,7 +54,8 @@ class FavoriteScreen extends StatelessWidget {
                 List<Widget> favoriteWidgets = [];
 
                 if (state is GetFavoriteSuccessState) {
-                  final List<FavoriteData> products = state.favoriteModel.data?.data ?? [];
+                  final List<FavoriteData> products =
+                      state.favoriteModel.data?.data ?? [];
 
                   if (products.isEmpty) {
                     favoriteWidgets.add(
@@ -72,7 +73,7 @@ class FavoriteScreen extends StatelessWidget {
                     favoriteWidgets = products.map((favoriteProduct) {
                       return ProductCard(
                         isInHome: false,
-                        product: favoriteProduct.product?? ProductData(),
+                        product: favoriteProduct.product ?? ProductData(),
                         height: 150,
                         reloadAll: false,
                       );

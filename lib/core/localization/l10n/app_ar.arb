@@ -52,7 +52,7 @@
   "note": "ملاحظات",
   "it_cant_be_empty": "لا يمكن ان يكون فارغ",
   "city": "المدينة",
-  "region": "المنطقة",
+  "street": "الشارع",
   "error_getting_current_location": "خطأ فى الحصول على الموقع الحالى",
   "select_location": "اختر الموقع",
   "confirm_location": "تأكيد الموقع",

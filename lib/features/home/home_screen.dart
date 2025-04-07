@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:e_commerce/core//widgets/horizontal_products_header.dart';
 import 'package:e_commerce/core/constants/kapi.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/core/helpers/dio_helper.dart';
@@ -23,6 +22,7 @@ import 'package:get/get.dart';
 
 import '../../core/localization/cubit/languages_cubit.dart';
 import '../../core/widgets/category_card.dart';
+import '../../core/widgets/horizontal_products_header.dart';
 import '../cart/cubit/get_cart/cart_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LanguageCubit langCubit = context.read<LanguageCubit>();
-    final String langText = HiveHelper.getLanguage() == "en" ? "ar" : "en";
+    final String langText = HiveHelper.getLanguage() == "en" ? "ع" : "en";
     _getData();
     return BlocProvider(
       create: (context) => ProductsCubit()..getProducts(context),
@@ -42,6 +42,13 @@ class HomeScreen extends StatelessWidget {
         child: Scaffold(
           backgroundColor: backgroundColor,
           appBar: AppBar(
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(height:40.h,child: Image.asset('assets/images/Logo.png')),SizedBox(width: 5.w,),
+                CustomText(text: "R-Store", textSize: 22.sp, textWeight: FontWeight.bold,textColor: baseColor,)
+              ],
+            ),
             actions: [
               TextButton(
                   onPressed: () {
@@ -54,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                   },
                   child: CustomText(
                       text: langText,
-                      textSize: 22,
+                      textSize: 24,
                       textColor: baseColor,
                       textWeight: FontWeight.bold))
             ],

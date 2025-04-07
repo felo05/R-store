@@ -14,7 +14,7 @@ final class CartErrorState extends CartState {
 final class CartLoadingState extends CartState {}
 
 final class CartSuccessState extends CartState {
-  final CartResponse cartResponse;
+  final CartData cartResponse;
 
   CartSuccessState(this.cartResponse);
 }

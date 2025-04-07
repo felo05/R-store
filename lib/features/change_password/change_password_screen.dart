@@ -87,8 +87,8 @@ class ChangePasswordScreen extends StatelessWidget {
                       ));
                     }
                     if (state is ChangePasswordSuccessState) {
-                      Get.offAll(() => MainScreen(
-                            selectedIndex: 0,
+                      Get.offAll(() => const MainScreen(
+                            initialIndex: 0,
                           ));
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(

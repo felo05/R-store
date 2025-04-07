@@ -97,7 +97,7 @@ class _CartItemCardState extends State<CartItemCard> {
                             quantity--;
                             widget.onChange(
                                 -widget.cartItem.product.price!.toInt());
-                            CartCubit.changeQuantity(
+                            CartCubit.changeQuantityCloudly(
                                 quantity: quantity,
                                 productId: widget.cartItem.product.id!.toInt());
                             setState(() {});
@@ -120,7 +120,7 @@ class _CartItemCardState extends State<CartItemCard> {
                           quantity++;
                           widget
                               .onChange(widget.cartItem.product.price!.toInt());
-                          CartCubit.changeQuantity(
+                          CartCubit.changeQuantityCloudly(
                             quantity: quantity,
                             productId: widget.cartItem.id.toInt(),
                           );
@@ -139,7 +139,7 @@ class _CartItemCardState extends State<CartItemCard> {
                         productId: widget.cartItem.product.id!.toInt(),
                         context: context,
                       );
-                      widget.onRemoveAll(quantity.toInt() *
+                      widget.onRemoveAll(quantity*
                           widget.cartItem.product.price!.toInt());
                     },
                     child: CustomText(

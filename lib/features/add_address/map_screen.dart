@@ -1,11 +1,12 @@
 import 'package:e_commerce/core/constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'complete_adding.dart';
 
 class LocationPickerScreen extends StatefulWidget {
@@ -17,8 +18,9 @@ class LocationPickerScreen extends StatefulWidget {
 
 class LocationPickerScreenState extends State<LocationPickerScreen> {
   LatLng _selectedPosition = LatLng(37.7749, -122.4194);
-  bool _isLoading = true; // Loading state
+  bool _isLoading = true;
   final MapController _mapController = MapController();
+  Placemark? _placeMark; // Nullable to handle uninitialized state
 
   @override
   void initState() {
@@ -33,7 +35,7 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
       setState(() {
         _isLoading = false;
       });
-      return null;
+      return AppLocalizations.of(context)?.error_getting_current_location; // Localized error message;
     }
 
     try {
@@ -46,6 +48,17 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
         _isLoading = false;
       });
 
+      // Fetch placemark for current location
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          _placeMark = placemarks[0];
+        });
+      }
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _mapController.move(_selectedPosition, 17);
@@ -55,15 +68,32 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
       setState(() {
         _isLoading = false;
       });
-      return  AppLocalizations.of(context)!.error_getting_current_location;
+      print("Error getting location: $e");
+      return AppLocalizations.of(context)!.error_getting_current_location;
     }
     return null;
   }
 
-  void _onTap(LatLng position) {
+  void _onTap(LatLng position) async {
     setState(() {
       _selectedPosition = position;
     });
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          _placeMark = placemarks[0];
+        });
+      }
+    } catch (e) {
+      print("Error during reverse geocoding: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to get address: $e")),
+      );
+    }
   }
 
   void _updateToCurrentLocation() async {
@@ -75,54 +105,96 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: BackAppBar(title: AppLocalizations.of(context)!.select_location, color: baseColor, textColor: Colors.black,),
-        body: const Center(child: CircularProgressIndicator()), // Show loading indicator
+        appBar: BackAppBar(
+          title: AppLocalizations.of(context)!.select_location,
+          color: baseColor,
+          textColor: Colors.black,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: BackAppBar(title: AppLocalizations.of(context)!.select_location, color: baseColor, textColor: Colors.black,),
-      body: FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          center: _selectedPosition,
-          zoom: 17,
-          maxZoom: 18,
-          minZoom: 1,
-          onTap: (_, position) => _onTap(position),
-        ),
+      appBar: BackAppBar(
+        title: AppLocalizations.of(context)!.select_location,
+        color: baseColor,
+        textColor: Colors.black,
+      ),
+      body: Column(
         children: [
-          TileLayer(
-            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: const ['a', 'b', 'c'],
-          ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: _selectedPosition,
-                builder: (ctx) => const Icon(
-                  Icons.location_pin,
-                  color: Colors.red,
-                  size: 40,
-                ),
+          Expanded(
+            child: FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                center: _selectedPosition,
+                zoom: 17,
+                maxZoom: 18,
+                minZoom: 1,
+                onTap: (_, position) => _onTap(position),
               ),
-            ],
+              children: [
+                TileLayer(
+                  urlTemplate:
+                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: const ['a', 'b', 'c'],
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: _selectedPosition,
+                      builder: (ctx) => const Icon(
+                        Icons.location_pin,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+          if (_placeMark != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Street: ${_placeMark!.street ?? 'Not available'}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    "City: ${_placeMark!.administrativeArea ?? 'Not available'}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton(
-            heroTag:  AppLocalizations.of(context)!.current_location,
+            heroTag: AppLocalizations.of(context)!.current_location,
             onPressed: _updateToCurrentLocation,
             child: const Icon(Icons.my_location),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
-            heroTag:  AppLocalizations.of(context)!.confirm_location,
+            heroTag: AppLocalizations.of(context)!.confirm_location,
             onPressed: () {
-              Get.to(() => CompleteAddAddress(position: _selectedPosition));
+              if (_placeMark != null) {
+                Get.to(() => CompleteAddAddress(
+                  position: _selectedPosition,
+                  placeMark: _placeMark!,
+                ));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text("Please select a location first")),
+                );
+              }
             },
             child: const Icon(Icons.check),
           ),

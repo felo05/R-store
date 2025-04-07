@@ -52,7 +52,7 @@
   "note": "Notes",
   "it_cant_be_empty": "It can't be empty",
   "city": "City",
-  "region": "Region",
+  "street": "Street",
   "error_getting_current_location": "Error getting current location",
   "select_location": "Select Location",
   "confirm_location": "Confirm Location",

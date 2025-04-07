@@ -109,7 +109,7 @@ class LoginScreen extends StatelessWidget {
                       ));
                     }
                     if (state is LoginSuccessState) {
-                      Get.offAll(() =>   MainScreen(selectedIndex: 0,));
+                      Get.offAll(() =>   const MainScreen(initialIndex: 0,));
                     }
                   },
                   builder: (context, state) {

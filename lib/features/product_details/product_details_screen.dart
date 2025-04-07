@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:e_commerce/core//widgets/horizontal_products_header.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/core/widgets/add_to_cart_bottom_navigation.dart';
 import 'package:e_commerce/core/widgets/custom_network_image.dart';
@@ -11,7 +10,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../core/widgets/horizontal_products_header.dart';
 import '../../core/widgets/product_card.dart';
+import '../cart/cubit/get_cart/cart_cubit.dart';
+import '../favorites/cubit/get_favorites_cubit/get_favorite_cubit.dart';
+import '../home/cubits/products/products_cubit.dart';
 import '../home/models/products_model.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
@@ -242,6 +245,11 @@ class _FavoriteIconState extends State<_FavoriteIcon> {
       onPressed: () async {
         FavoritesRepositoryImplementation()
             .addFavorite(widget.product.id!.toInt(), context, true, true);
+
+          context.read<GetFavoriteCubit>().getFavorites(context);
+          context.read<ProductsCubit>().getProducts(context);
+          context.read<CartCubit>().getCart(context);
+
         setState(() {
           isFavorite = !isFavorite;
         });

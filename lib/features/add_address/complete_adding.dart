@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -16,22 +17,26 @@ import 'cubit/add_address_cubit.dart';
 class CompleteAddAddress extends StatelessWidget {
   final LatLng position;
 
-  CompleteAddAddress({super.key, required this.position});
+  CompleteAddAddress({super.key, required this.position, this.placeMark});
 
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode cityFocusNode = FocusNode();
-  final FocusNode regionFocusNode = FocusNode();
+  final FocusNode streetFocusNode = FocusNode();
   final FocusNode detailsFocusNode = FocusNode();
   final FocusNode notesFocusNode = FocusNode();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
-  final TextEditingController regionController = TextEditingController();
+  final TextEditingController streetController = TextEditingController();
   final TextEditingController detailsController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Placemark? placeMark ;
 
   @override
   Widget build(BuildContext context) {
+    print(placeMark?.toJson());
+    streetController.text = placeMark?.street ?? '';
+    cityController.text = placeMark?.locality ?? '';
     return Scaffold(
       appBar: BackAppBar(
         title: AppLocalizations.of(context)!.add_address,
@@ -75,20 +80,20 @@ class CompleteAddAddress extends StatelessWidget {
                     controller: cityController,
                     currentFocusNode: cityFocusNode,
                     onSubmit: (input) {
-                      FocusScope.of(context).requestFocus(regionFocusNode);
+                      FocusScope.of(context).requestFocus(streetFocusNode);
                     },
                   ),
                   SizedBox(height: 20.h),
                   CustomTextField(
-                    text: AppLocalizations.of(context)!.region,
+                    text: AppLocalizations.of(context)!.street,
                     validator: (input) {
                       if (input!.isEmpty) {
                         return AppLocalizations.of(context)!.it_cant_be_empty;
                       }
                       return null;
                     },
-                    controller: regionController,
-                    currentFocusNode: regionFocusNode,
+                    controller: streetController,
+                    currentFocusNode: streetFocusNode,
                     onSubmit: (input) {
                       FocusScope.of(context).requestFocus(detailsFocusNode);
                     },
@@ -96,12 +101,6 @@ class CompleteAddAddress extends StatelessWidget {
                   SizedBox(height: 20.h),
                   CustomTextField(
                     text: AppLocalizations.of(context)!.details,
-                    validator: (input) {
-                      if (input!.isEmpty) {
-                        return AppLocalizations.of(context)!.it_cant_be_empty;
-                      }
-                      return null;
-                    },
                     controller: detailsController,
                     currentFocusNode: detailsFocusNode,
                     onSubmit: (input) {
@@ -120,7 +119,7 @@ class CompleteAddAddress extends StatelessWidget {
                               AddressData(
                                   name: nameController.text,
                                   city: cityController.text,
-                                  region: regionController.text,
+                                  region: streetController.text,
                                   details: detailsController.text,
                                   notes: input,
                                   latitude: position.latitude,
@@ -140,8 +139,8 @@ class CompleteAddAddress extends StatelessWidget {
                           ),
                         );
                       } else if (state is AddAddressSuccessState) {
-                        Get.offAll(() => MainScreen(
-                              selectedIndex: 1,
+                        Get.offAll(() => const MainScreen(
+                              initialIndex: 1,
                             ));
                       }
                     },
@@ -160,7 +159,7 @@ class CompleteAddAddress extends StatelessWidget {
                                 AddressData(
                                     name: nameController.text,
                                     city: cityController.text,
-                                    region: regionController.text,
+                                    region: streetController.text,
                                     details: detailsController.text,
                                     notes: notesController.text,
                                     latitude: position.latitude,

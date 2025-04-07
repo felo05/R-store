@@ -13,6 +13,7 @@ import 'package:get/route_manager.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../add_address/map_screen.dart';
+import '../home/main_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key, required this.products});
@@ -199,6 +200,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       content: Text(state.message),
                       backgroundColor: Colors.red,
                     ));
+                  }
+                  if (state is CheckoutSuccessState) {
+                    Get.offAll(() => const MainScreen(initialIndex: 0));
                   }
                 },
                 builder: (context, state) {

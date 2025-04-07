@@ -10,6 +10,9 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../core/constants/kcolors.dart';
+import '../../features/cart/cubit/get_cart/cart_cubit.dart';
+import '../../features/favorites/cubit/get_favorites_cubit/get_favorite_cubit.dart';
+import '../../features/home/cubits/products/products_cubit.dart';
 
 class AddToCartBottomNavigation extends StatefulWidget {
   const AddToCartBottomNavigation({
@@ -44,6 +47,11 @@ class AddToCartBottomNavigationState extends State<AddToCartBottomNavigation> {
                   .showSnackBar(SnackBar(content: Text(state.errorMsg)));
             }
             if (state is AddToCartSuccessState) {
+              if (!isInCart) {
+                context.read<CartCubit>().getCart(context);
+              }
+              context.read<GetFavoriteCubit>().getFavorites(context);
+              context.read<ProductsCubit>().getProducts(context);
               setState(() {
                 isInCart = true;
               });
@@ -144,7 +152,7 @@ class AddToCartBottomNavigationState extends State<AddToCartBottomNavigation> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6),
       child: GestureDetector(
         onTap: () {
-          Get.offAll(() => MainScreen(selectedIndex: 2));
+          Get.offAll(() => const MainScreen(initialIndex: 2));
         },
         child: Container(
           width: double.infinity,

@@ -145,8 +145,8 @@ class RegisterScreen extends StatelessWidget {
                           );
                         }
                         if (state is RegisterSuccessState) {
-                          Get.offAll(() => MainScreen(
-                                selectedIndex: 0,
+                          Get.offAll(() => const MainScreen(
+                                initialIndex: 0,
                               ));
                         }
                       },

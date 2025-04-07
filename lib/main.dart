@@ -62,8 +62,8 @@ class MyApp extends StatelessWidget {
                 home: HiveHelper.isFirstTime()
                     ? const OnboardingScreen()
                     : HiveHelper.isLoggedin()
-                        ? MainScreen(
-                            selectedIndex: 0,
+                        ? const MainScreen(
+                            initialIndex: 0,
                           )
                         : LoginScreen(),
               );
