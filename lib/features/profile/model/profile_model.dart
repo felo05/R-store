@@ -15,15 +15,12 @@ class ProfileModel {
   bool? status;
   dynamic message;
   ProfileData? data;
-
-
-
 }
 
 @HiveType(typeId: 1) // Assign a unique typeId
 class ProfileData extends HiveObject {
   @HiveField(0)
-  num? id;
+  dynamic id; // Changed to dynamic to support both num and String (Firebase UID)
 
   @HiveField(1)
   String? name;

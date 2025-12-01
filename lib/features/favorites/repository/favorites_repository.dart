@@ -8,5 +8,5 @@ abstract class FavoritesRepository {
   Future<Either<Failure, FavoriteModel>> getFavorites(BuildContext context);
 
   void addFavorite(
-      int productID, BuildContext context, bool? isInHomeScreen, bool reloadAllRelatedData);
+      String productID, BuildContext context, bool? isInHomeScreen, bool reloadAllRelatedData);
 }

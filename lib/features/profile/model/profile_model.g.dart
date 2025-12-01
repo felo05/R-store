@@ -17,7 +17,7 @@ class ProfileDataAdapter extends TypeAdapter<ProfileData> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ProfileData(
-      id: fields[0] as num?,
+      id: fields[0] as dynamic,
       name: fields[1] as String?,
       email: fields[2] as String?,
       phone: fields[3] as String?,

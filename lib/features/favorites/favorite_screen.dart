@@ -6,7 +6,7 @@ import 'package:e_commerce/features/favorites/model/favorite_model.dart';
 import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});

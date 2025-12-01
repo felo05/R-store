@@ -48,6 +48,6 @@ class FavoriteData {
         : null;
   }
 
-  num? id;
+  String? id;
   ProductData? product;
 }

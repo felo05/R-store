@@ -1,12 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce/core//constants/kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
 import 'package:e_commerce/features/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 
 import '../../core/widgets/custom_text.dart';
 import '../profile/model/profile_model.dart';
@@ -47,11 +45,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              ClipOval(
-                child:CachedNetworkImage(imageUrl: widget.user.image??"" , fit: BoxFit.cover,width: 125.w,
-                  placeholder: (context, url) => Container(height: 80.h,),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),              ),
+              const ClipOval(
+                child:SizedBox(height: 125,child: Icon(Icons.person,size: 100,),)  ),
               const SizedBox(height: 20),
               CustomTextField(
                 text: AppLocalizations.of(context)!.name,

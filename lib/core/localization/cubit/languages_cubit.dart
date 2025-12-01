@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:meta/meta.dart';
 
-import '../../helpers/dio_helper.dart';
 import '../../helpers/hive_helper.dart';
 
 part 'languages_state.dart';
@@ -38,16 +37,13 @@ class LanguageCubit extends Cubit<LanguageState> {
     Get.updateLocale(const Locale("ar"));
     HiveHelper.setLanguage('ar');
     emit(SelectedLocale(_locale = const Locale('ar', '')));
-    DioHelpers.init();
   }
 
   void toEnglish() {
     Get.updateLocale(const Locale("en"));
     HiveHelper.setLanguage('en');
     emit(SelectedLocale(_locale = const Locale('en', '')));
-    DioHelpers.init();
   }
 
   static bool get isArabic => currentLanguage == 'ar';
-
 }

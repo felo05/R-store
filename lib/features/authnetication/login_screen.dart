@@ -2,7 +2,7 @@ import 'package:e_commerce/features/authnetication/cubit/login_cubit/login_cubit
 import 'package:e_commerce/features/authnetication/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:get/get.dart';
 
 import '../../core/constants/Kcolors.dart';
@@ -109,7 +109,7 @@ class LoginScreen extends StatelessWidget {
                       ));
                     }
                     if (state is LoginSuccessState) {
-                      Get.offAll(() =>   const MainScreen(initialIndex: 0,));
+                      Get.offAll(   const MainScreen(initialIndex: 0,));
                     }
                   },
                   builder: (context, state) {
@@ -157,7 +157,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.offAll(() => RegisterScreen());
+                        Get.offAll(RegisterScreen());
                       },
                       child: CustomText(
                         text: AppLocalizations.of(context)!.signup,

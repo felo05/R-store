@@ -34,7 +34,7 @@ class CartData {
 }
 
 class CartItem {
-  final int id;
+  final String id;
   final int quantity;
   final ProductData product;
 

@@ -1,7 +1,8 @@
 import 'package:e_commerce/core//constants/kcolors.dart';
 import 'package:e_commerce/core//widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../localization/l10n/app_localizations.dart';
 
 class HorizontalProductsHeader extends StatelessWidget {
   final String text;

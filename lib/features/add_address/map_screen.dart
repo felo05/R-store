@@ -1,7 +1,8 @@
 import 'package:e_commerce/core/constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -68,7 +69,9 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
       setState(() {
         _isLoading = false;
       });
-      print("Error getting location: $e");
+      if (kDebugMode) {
+        print("Error getting location: $e");
+      }
       return AppLocalizations.of(context)!.error_getting_current_location;
     }
     return null;
@@ -89,7 +92,9 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
         });
       }
     } catch (e) {
-      print("Error during reverse geocoding: $e");
+      if (kDebugMode) {
+        print("Error during reverse geocoding: $e");
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to get address: $e")),
       );
@@ -185,7 +190,7 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
             heroTag: AppLocalizations.of(context)!.confirm_location,
             onPressed: () {
               if (_placeMark != null) {
-                Get.to(() => CompleteAddAddress(
+                Get.to( CompleteAddAddress(
                   position: _selectedPosition,
                   placeMark: _placeMark!,
                 ));

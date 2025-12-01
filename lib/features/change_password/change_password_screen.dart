@@ -3,7 +3,7 @@ import 'package:e_commerce/features/change_password/cubit/change_password_cubit.
 import 'package:e_commerce/features/home/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:get/route_manager.dart';
 
 import '../../core/constants/Kcolors.dart';
@@ -87,7 +87,7 @@ class ChangePasswordScreen extends StatelessWidget {
                       ));
                     }
                     if (state is ChangePasswordSuccessState) {
-                      Get.offAll(() => const MainScreen(
+                      Get.offAll( const MainScreen(
                             initialIndex: 0,
                           ));
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

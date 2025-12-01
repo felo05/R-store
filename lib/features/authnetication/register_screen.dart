@@ -4,7 +4,7 @@ import 'package:e_commerce/core/widgets/login_and_register_header.dart';
 import 'package:e_commerce/features/authnetication/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:get/get.dart';
 
 import '../../core/widgets/custom_text_field.dart';
@@ -145,7 +145,7 @@ class RegisterScreen extends StatelessWidget {
                           );
                         }
                         if (state is RegisterSuccessState) {
-                          Get.offAll(() => const MainScreen(
+                          Get.offAll( const MainScreen(
                                 initialIndex: 0,
                               ));
                         }
@@ -200,7 +200,7 @@ class RegisterScreen extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Get.offAll(() => LoginScreen());
+                            Get.offAll( LoginScreen());
                           },
                           child: CustomText(
                             text: AppLocalizations.of(context)!.login,

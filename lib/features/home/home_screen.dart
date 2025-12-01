@@ -1,7 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:e_commerce/core/constants/kapi.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
-import 'package:e_commerce/core/helpers/dio_helper.dart';
+import 'package:e_commerce/core/helpers/firebase_helper.dart';
 import 'package:e_commerce/core/helpers/hive_helper.dart';
 import 'package:e_commerce/core/widgets/custom_network_image.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
@@ -14,9 +13,10 @@ import 'package:e_commerce/features/home/cubits/products/products_cubit.dart';
 import 'package:e_commerce/features/profile/model/profile_model.dart';
 import 'package:e_commerce/features/search/search_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -248,7 +248,7 @@ class HomeScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               return ProductCard(
                                 product: products[index],
-                                height: 135,
+                                height: 130,
                                 isInHome: true,
                                 reloadAll: false,
                               );
@@ -281,10 +281,25 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _getData() async {
-    final response = await DioHelpers.getData(path: Kapi.profile);
-    response.data["status"]
-        ? HiveHelper.setUser(ProfileData.fromJson(response.data["data"]))
-        : null;
+    try {
+      if (FirebaseHelper.currentUserId == null) return;
+
+      final userDoc = await FirebaseHelper.firestore
+          .collection(FirebaseHelper.usersCollection)
+          .doc(FirebaseHelper.currentUserId)
+          .get();
+
+      if (userDoc.exists) {
+        final userData = userDoc.data()!;
+        HiveHelper.setUser(ProfileData.fromJson(userData));
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        if (kDebugMode) {
+          print('Error getting profile data: $e');
+        }
+      }
+    }
   }
 
   void _reloadData(BuildContext context) {

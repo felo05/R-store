@@ -5,7 +5,7 @@ import 'package:e_commerce/features/favorites/cubit/get_favorites_cubit/get_favo
 import 'package:e_commerce/features/home/cubits/products/products_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:get/route_manager.dart';
 
 import '../../core/constants/Kcolors.dart';
@@ -13,16 +13,19 @@ import '../../core/widgets/cart_product_card.dart';
 import '../../core/widgets/custom_text.dart';
 import '../checkout/checkout_screen.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
 
+class _CartScreenState extends State<CartScreen> {
+  num total = 0;
+  List<CartItem> products = [];
 
   @override
   Widget build(BuildContext context) {
-    int total = 0;
-
-    List<CartItem> products = [];
     return BlocProvider(
       create: (context) => ChangeTotalCubit(),
       child: Scaffold(
@@ -37,60 +40,15 @@ class CartScreen extends StatelessWidget {
         ),
         body: BlocConsumer<CartCubit, CartState>(
           builder: (context, state) {
-            if (state is CartLoadingState) {
-              return const Center(
-                child: CircularProgressIndicator(color: baseColor),
-              );
-            }
-
-            if (state is CartSuccessState) {
-              products = state.cartResponse.cartItems ?? [];
-              total = state.cartResponse.total!.toInt();
-              return RefreshIndicator(
-                onRefresh: () async {
-                  context.read<CartCubit>().getCart(context);
-                },
-                child: products.isEmpty
-                    ? ListView(
-                  padding: const EdgeInsets.all(16.0),
-                  children: [
-                    Center(
-                      child: CustomText(
-                        text: AppLocalizations.of(context)!
-                            .no_products_added_to_cart_yet,
-                        textSize: 18,
-                        textWeight: FontWeight.w500,
-                        textColor: baseColor,
-                      ),
-                    ),
-                  ],
-                )
-                    : ListView.builder(
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        return CartItemCard(
-                          cartItem: products[index],
-                          onRemoveAll: (int newTotal) {
-                            products.removeAt(index);
-                            total -= newTotal;
-                            context.read<CartCubit>().emitSuccessState(CartData(cartItems: products, total: total));
-                            context
-                                .read<ProductsCubit>()
-                                .getProducts(context);
-                            context
-                                .read<GetFavoriteCubit>()
-                                .getFavorites(context);
-                          },
-                          onChange: (int newTotal) {
-                            total += newTotal;
-                            context.read<ChangeTotalCubit>().changeTotal();
-                          },
-                        );
-                      },
-                    ),
-              );
-            }
-            return const SizedBox.shrink();
+            return RefreshIndicator(
+              color: baseColor,
+              onRefresh: () async {
+                context.read<CartCubit>().getCart(context);
+                // Wait for the state to update
+                await Future.delayed(const Duration(milliseconds: 500));
+              },
+              child: _buildCartContent(state, context),
+            );
           },
           listener: (BuildContext context, CartState state) {
             if (state is CartErrorState) {
@@ -106,18 +64,16 @@ class CartScreen extends StatelessWidget {
                 ),
               );
             }
+            if (state is CartSuccessState) {
+              setState(() {
+                products = state.cartResponse.cartItems ?? [];
+                total = (state.cartResponse.total ?? 0);
+              });
+            }
           },
         ),
-        bottomNavigationBar: BlocConsumer<CartCubit, CartState>(
-          listener: (context, state) {
-            if (state is CartSuccessState) {
-              total = state.cartResponse.total!.toInt();
-            }
-          },
-          builder: (context, state) {
-            if (state is CartLoadingState) {
-              total = 0;
-            }
+        bottomNavigationBar: BlocBuilder<ChangeTotalCubit, ChangeTotalState>(
+          builder: (context, changeState) {
             return Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
@@ -131,44 +87,120 @@ class CartScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: BlocBuilder<ChangeTotalCubit, ChangeTotalState>(
-                builder: (context, state) {
-                  return Row(
-                    children: [
-                      CustomText(
-                        text: AppLocalizations.of(context)!.total,
-                        textSize: 24,
-                        textWeight: FontWeight.bold,
-                      ),
-                      CustomText(
-                        text: "\$${total.toStringAsFixed(2)}",
-                        textSize: 18,
-                        textWeight: FontWeight.bold,
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() =>
-                              CheckoutScreen(
-                                products:
-                                CartData(cartItems: products, total: total),
-                              ));
-                        },
-                        child: CustomText(
-                          text: AppLocalizations.of(context)!.checkout,
-                          textSize: 24,
-                          textWeight: FontWeight.bold,
-                          textColor: total <= 0 ? Colors.grey : baseColor,
+              child: Row(
+                children: [
+                  CustomText(
+                    text: AppLocalizations.of(context)!.total,
+                    textSize: 24,
+                    textWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(width: 8),
+                  CustomText(
+                    text: "\$${total.toStringAsFixed(2)}",
+                    textSize: 18,
+                    textWeight: FontWeight.bold,
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: total <= 0 ? null : () {
+                      Get.to(
+                        CheckoutScreen(
+                          products: CartData(cartItems: products, total: total),
                         ),
-                      ),
-                    ],
-                  );
-                },
+                      );
+                    },
+                    child: CustomText(
+                      text: AppLocalizations.of(context)!.checkout,
+                      textSize: 24,
+                      textWeight: FontWeight.bold,
+                      textColor: total <= 0 ? Colors.grey : baseColor,
+                    ),
+                  ),
+                ],
               ),
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildCartContent(CartState state, BuildContext context) {
+    if (state is CartLoadingState) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 200),
+          Center(
+            child: CircularProgressIndicator(color: baseColor),
+          ),
+        ],
+      );
+    }
+
+    if (state is CartSuccessState) {
+      if (products.isEmpty) {
+        return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            const SizedBox(height: 100),
+            Center(
+              child: CustomText(
+                text: AppLocalizations.of(context)!.no_products_added_to_cart_yet,
+                textSize: 18,
+                textWeight: FontWeight.w500,
+                textColor: baseColor,
+              ),
+            ),
+          ],
+        );
+      }
+
+      return ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          return CartItemCard(
+            cartItem: products[index],
+            onRemoveAll: (num removedTotal) {
+              setState(() {
+                total -= removedTotal;
+                products.removeAt(index);
+              });
+              context.read<CartCubit>().emitSuccessState(
+                CartData(cartItems: products, total: total),
+              );
+              context.read<ProductsCubit>().getProducts(context);
+              context.read<GetFavoriteCubit>().getFavorites(context);
+              context.read<ChangeTotalCubit>().changeTotal();
+            },
+            onChange: (num changeAmount) {
+              setState(() {
+                total += changeAmount;
+              });
+              context.read<ChangeTotalCubit>().changeTotal();
+            },
+          );
+        },
+      );
+    }
+
+    // Error or initial state
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        const SizedBox(height: 100),
+        Center(
+          child: CustomText(
+            text: AppLocalizations.of(context)!.no_products_added_to_cart_yet,
+            textSize: 18,
+            textWeight: FontWeight.w500,
+            textColor: baseColor,
+          ),
+        ),
+      ],
     );
   }
 }

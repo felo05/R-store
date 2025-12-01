@@ -1,7 +1,4 @@
 import 'package:e_commerce/features/add_address/model/address_model.dart';
-import 'package:e_commerce/core/constants/kapi.dart';
-import 'package:e_commerce/core/helpers/dio_helper.dart';
-import 'package:flutter/cupertino.dart';
 
 class OrdersModel {
   OrdersModel({
@@ -42,41 +39,37 @@ class BaseOrders {
     this.total,
     this.date,
     this.status,
-  }) ;
+    this.address,
+    this.products,
+    this.paymentMethod,
+  });
 
   BaseOrders.fromJson(dynamic json) {
     id = json['id'];
     total = json['total'];
     date = json['date'];
     status = json['status'];
-    _orderDetailsFuture = _fetchOrderDetails();
+    paymentMethod = json['paymentMethod'];
+
+    // Parse address directly
+    address = json['address'] != null
+        ? AddressData.fromJson(json['address'])
+        : null;
+
+    // Parse products directly
+    products = (json['products'] as List<dynamic>?)
+        ?.map((product) => ProductOrder.fromJson(product))
+        .toList();
   }
 
-  num? id;
+  String? id;
   num? total;
   String? date;
   String? status;
-
-  late final Future<OrderDetails> _orderDetailsFuture;
-
-  Future<OrderDetails> _fetchOrderDetails() async {
-    try {
-      final response = await DioHelpers.getData(path: "${Kapi.orders}/$id");
-      if (response.data != null) {
-        return OrderDetails.fromJson(response.data);
-      } else {
-        throw Exception("Response data is null");
-      }
-    } catch (e) {
-      debugPrint("Error fetching order details: $e");
-      throw Exception("Failed to fetch order details: $e");
-    }
-  }
-
-
-  Future<OrderDetails> get orderDetails => _orderDetailsFuture;
+  int? paymentMethod;
+  AddressData? address;
+  List<ProductOrder>? products;
 }
-
 
 class ProductOrder {
   ProductOrder({
@@ -88,14 +81,14 @@ class ProductOrder {
   });
 
   ProductOrder.fromJson(dynamic json) {
-    id = json['id'];
+    id = json['product_id']?.toString() ?? json['id']?.toString();
     name = json['name'];
     price = json['price'];
     image = json['image'];
     quantity = json['quantity'];
   }
 
-  num? id;
+  String? id;
   String? name;
   num? price;
   String? image;
@@ -127,7 +120,6 @@ class OrderDetails {
       throw Exception("Error parsing OrderDetails: $e");
     }
   }
-
 
   bool? status;
   String? message;

@@ -91,5 +91,7 @@
   "unexpected_error_occurred": "An unexpected error occurred. Please try again!",
   "authentication_or_authorization_error": "Authentication or authorization error. Please try again.",
   "the_requested_resource_was_not_found": "The requested resource was not found.",
-  "internal_server_error" : "Internal server error. Please try again later."
+  "internal_server_error" : "Internal server error. Please try again later.",
+  "please_select_all_fields": "Please select all fields",
+  "delivery_address": "Delivery Address"
 }

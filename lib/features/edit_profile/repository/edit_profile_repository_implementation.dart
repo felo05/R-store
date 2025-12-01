@@ -1,9 +1,8 @@
-import 'package:dio/dio.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce/core/errors/api_errors.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../../core/constants/kapi.dart';
-import '../../../core/helpers/dio_helper.dart';
+import '../../../core/helpers/firebase_helper.dart';
 import '../../../core/helpers/hive_helper.dart';
 import '../../profile/model/profile_model.dart';
 import '../../profile/profile_screen.dart';
@@ -14,21 +13,25 @@ class EditProfileRepositoryImplementation implements EditProfileRepository {
   Future<Failure?> updateProfile(
       String name, String email, String phone, BuildContext context) async {
     try {
-      final response=await DioHelpers.putData(path: Kapi.updateProfile, body: {
+      if (FirebaseHelper.currentUserId == null) {
+        return const ServerFailure('User not logged in');
+      }
+
+      await FirebaseHelper.firestore
+          .collection(FirebaseHelper.usersCollection)
+          .doc(FirebaseHelper.currentUserId)
+          .update({
         'name': name,
         'email': email,
         'phone': phone,
-        'image': null,
+        'updatedAt': FieldValue.serverTimestamp(),
       });
-      if(response.data["status"] == false) return (ServerFailure(response.data["message"]));
 
       return null;
     } catch (e) {
-      if (e is DioException) return ServerFailure.fromDioError(e, context);
       return ServerFailure(e.toString());
     }
   }
-
 
   @override
   void updateLocaleProfileData(String name, String email, String phone) {
@@ -41,8 +44,7 @@ class EditProfileRepositoryImplementation implements EditProfileRepository {
         name: name,
         email: email,
         phone: phone,
-        image:
-            "https://student.valuxapps.com/storage/assets/defaults/user.jpg");
+        image: oldUserData.image);
     HiveHelper.setUser(newUserData);
     ProfileScreen.user = newUserData;
   }

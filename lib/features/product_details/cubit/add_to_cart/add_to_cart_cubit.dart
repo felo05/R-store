@@ -8,14 +8,14 @@ class AddToCartCubit extends Cubit<AddToCartState> {
   AddToCartCubit() : super(AddToCartInitial());
 
   void addToCart({
-    required int productId,
+    required dynamic productId,
     int? quantity,
     required BuildContext context,
     required bool isInCartScreen,
   }) async {
     emit(AddToCartLoadingState());
     await ProductDetailsRepositoryImplementation()
-        .addToCart(productId, quantity, context)
+        .addToCart(productId.toString(), quantity, context)
         .then((failure) {
       if (failure == null) {
 
@@ -25,11 +25,12 @@ class AddToCartCubit extends Cubit<AddToCartState> {
       }
     });
   }
+
   static void removeFromCart({
-    required int productId,
+    required dynamic productId,
     required BuildContext context,
   }) async {
     await ProductDetailsRepositoryImplementation()
-        .addToCart(productId, 0, context);
+        .deleteFromCart(productId.toString(), context);
   }
 }

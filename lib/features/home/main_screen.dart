@@ -1,5 +1,4 @@
 import 'package:e_commerce/core/constants/kcolors.dart';
-import 'package:e_commerce/core/helpers/dio_helper.dart';
 import 'package:e_commerce/features/cart/cart_screen.dart';
 import 'package:e_commerce/features/favorites/favorite_screen.dart';
 import 'package:e_commerce/features/home/home_screen.dart';
@@ -40,7 +39,6 @@ class _MainScreen extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    DioHelpers.init();
     selectedIndex = widget.initialIndex;
 
     // Initialize PageController with the initial index

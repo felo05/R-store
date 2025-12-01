@@ -7,7 +7,7 @@ import 'package:e_commerce/features/favorites/repository/favorites_repository_im
 import 'package:e_commerce/features/product_details/cubit/products_in_details/products_in_details_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/widgets/horizontal_products_header.dart';
@@ -183,16 +183,25 @@ class ProductDetailsScreen extends StatelessWidget {
                           child:
                           const Center(child: CircularProgressIndicator()));
                     } else if (state is ProductsInDetailsSuccessState) {
-                      final products = state.productsModel.data?.data ?? [];
+                      final allProducts = state.productsModel.data?.data ?? [];
+                      // Filter out the current product from similar products
+                      final currentProductId = product.id?.toString();
+                      final similarProducts = allProducts.where((p) {
+                        if (p.id == null || currentProductId == null) {
+                          return true; // Include if we can't compare
+                        }
+                        return p.id.toString() != currentProductId;
+                      }).toList();
+
                       return SizedBox(
                         height: 250.h,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: products.length,
+                          itemCount: similarProducts.length,
                           itemBuilder: (context, index) {
                             return ProductCard(
-                              product: products[index],
-                              height: 135,
+                              product: similarProducts[index],
+                              height: 130,
                               isInHome: true,
                               reloadAll: true,
                             );
@@ -243,8 +252,17 @@ class _FavoriteIconState extends State<_FavoriteIcon> {
         color: Colors.red,
       ),
       onPressed: () async {
+        // Safely convert product id to string, handling null case
+        final productId = widget.product.id?.toString() ?? '';
+        if (productId.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product ID is missing')),
+          );
+          return;
+        }
+
         FavoritesRepositoryImplementation()
-            .addFavorite(widget.product.id!.toInt(), context, true, true);
+            .addFavorite(productId, context, true, true);
 
           context.read<GetFavoriteCubit>().getFavorites(context);
           context.read<ProductsCubit>().getProducts(context);

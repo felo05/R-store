@@ -2,14 +2,15 @@ import 'package:e_commerce/core//constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
 import 'package:e_commerce/features/add_address/model/address_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/widgets/custom_text.dart';
 import '../home/main_screen.dart';
 import 'cubit/add_address_cubit.dart';
@@ -34,9 +35,11 @@ class CompleteAddAddress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(placeMark?.toJson());
+    if (kDebugMode) {
+      print(placeMark?.toJson());
+    }
     streetController.text = placeMark?.street ?? '';
-    cityController.text = placeMark?.locality ?? '';
+    cityController.text = placeMark?.subAdministrativeArea ?? '';
     return Scaffold(
       appBar: BackAppBar(
         title: AppLocalizations.of(context)!.add_address,
@@ -139,8 +142,8 @@ class CompleteAddAddress extends StatelessWidget {
                           ),
                         );
                       } else if (state is AddAddressSuccessState) {
-                        Get.offAll(() => const MainScreen(
-                              initialIndex: 1,
+                        Get.offAll( const MainScreen(
+                              initialIndex: 2,
                             ));
                       }
                     },

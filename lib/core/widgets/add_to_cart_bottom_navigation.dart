@@ -4,7 +4,6 @@ import 'package:e_commerce/features/product_details/cubit/add_to_cart/add_to_car
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -13,6 +12,7 @@ import '../../core/constants/kcolors.dart';
 import '../../features/cart/cubit/get_cart/cart_cubit.dart';
 import '../../features/favorites/cubit/get_favorites_cubit/get_favorite_cubit.dart';
 import '../../features/home/cubits/products/products_cubit.dart';
+import '../localization/l10n/app_localizations.dart';
 
 class AddToCartBottomNavigation extends StatefulWidget {
   const AddToCartBottomNavigation({
@@ -113,7 +113,7 @@ class AddToCartBottomNavigationState extends State<AddToCartBottomNavigation> {
               child: GestureDetector(
                 onTap: () {
                   context.read<AddToCartCubit>().addToCart(
-                    productId: widget.product.id!.toInt(),
+                    productId: widget.product.id!,
                     quantity: counter,
                     context: context,
                     isInCartScreen: false,
@@ -130,8 +130,7 @@ class AddToCartBottomNavigationState extends State<AddToCartBottomNavigation> {
                     child: CustomText(
                       text:
                       "${AppLocalizations.of(context)!
-                          .add_to_cart}  |  \$${widget.product.price!.toInt() *
-                          counter}",
+                          .add_to_cart}  |  \$${(widget.product.price! * counter).toStringAsFixed(2)}",
                       textSize: 15,
                       textColor: Colors.white,
                       textWeight: FontWeight.w500,
@@ -152,7 +151,7 @@ class AddToCartBottomNavigationState extends State<AddToCartBottomNavigation> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6),
       child: GestureDetector(
         onTap: () {
-          Get.offAll(() => const MainScreen(initialIndex: 2));
+          Get.offAll(const MainScreen(initialIndex: 2));
         },
         child: Container(
           width: double.infinity,

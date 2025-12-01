@@ -60,7 +60,7 @@ class ProductData {
     inFavorites = json['in_favorites'];
     inCart = json['in_cart'];
   }
-  num? id;
+  dynamic id; // Changed to dynamic to support both num and String (Firestore document ID)
   num? price;
   num? oldPrice;
   num? discount;

@@ -1,5 +1,6 @@
 import 'package:e_commerce/features/profile/model/profile_model.dart';
 import 'package:hive/hive.dart';
+import 'package:e_commerce/core/helpers/firebase_helper.dart';
 
 class HiveHelper {
   static String boxKey = "BoxKey";
@@ -9,10 +10,8 @@ class HiveHelper {
   static String langKey = "LangKey";
 
   static bool isLoggedin() {
-    if (Hive.box(boxKey).containsKey(tokenKey)&&Hive.box(boxKey).get(tokenKey).length>3)  {
-      return true;
-    }
-    return false;
+    // Check Firebase authentication instead of token
+    return FirebaseHelper.isLoggedIn;
   }
 
   static void inFirstTime() async {
@@ -27,14 +26,13 @@ class HiveHelper {
   }
 
   static void setToken(String token) async {
+    // Keep for compatibility, but Firebase handles tokens internally
     await Hive.box(boxKey).put(tokenKey, token);
   }
 
   static String? getToken() {
-    if(Hive.box(boxKey).containsKey(tokenKey)){
-      return Hive.box(boxKey).get(tokenKey);
-    }
-    return null;
+    // Return Firebase user ID as token
+    return FirebaseHelper.currentUserId;
   }
 
   static void removeToken() async {

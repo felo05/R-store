@@ -2,7 +2,7 @@ import 'package:e_commerce/core/helpers/hive_helper.dart';
 import 'package:e_commerce/features/authnetication/login_screen.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import 'package:get/get.dart';
 
 class OnboardingScreen extends StatefulWidget {

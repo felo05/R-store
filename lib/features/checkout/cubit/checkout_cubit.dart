@@ -8,8 +8,8 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   CheckoutCubit() : super(CheckoutInitial());
 
   void checkout(
-      {required int paymentMethod,
-      required int addressId,
+      {required String paymentMethod,
+      required String addressId,
       required BuildContext context}) async {
     emit(CheckoutLoadingState());
 

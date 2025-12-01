@@ -1,15 +1,11 @@
 import 'package:e_commerce/features//home/cubits/products/products_cubit.dart';
-import 'package:e_commerce/features/favorites/repository/favorites_repository_implementation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
 
-import '../../features/cart/cubit/get_cart/cart_cubit.dart';
-import '../../features/favorites/cubit/get_favorites_cubit/get_favorite_cubit.dart';
 import '../../features/home/models/products_model.dart';
 import '../../features/product_details/product_details_screen.dart';
+import '../localization/l10n/app_localizations.dart';
 import 'custom_network_image.dart';
 import 'custom_text.dart';
 
@@ -41,7 +37,7 @@ class _ProductCardState extends State<ProductCard> {
         onTap: () async {
           if (widget.product.images!.isNotEmpty &&
               widget.product.discount != null) {
-            Get.to(() => ProductDetailsScreen(product: widget.product));
+            Get.to( ProductDetailsScreen(product: widget.product));
           } else {
             (await ProductsCubit.getAProduct(
                     widget.product.id!.toInt(), context))
@@ -53,7 +49,7 @@ class _ProductCardState extends State<ProductCard> {
                 ),
               );
             }, (data) {
-              Get.to(() => ProductDetailsScreen(product: data));
+              Get.to( ProductDetailsScreen(product: data));
             });
           }
         },
@@ -73,49 +69,10 @@ class _ProductCardState extends State<ProductCard> {
                       child: SizedBox(
                         height: widget.height.h + 2,
                         child: CustomNetworkImage(
-                            height: widget.height,
+                            height: widget.height.h,
                             image: widget.product.image ?? ""),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: IconButton(
-                        icon: Icon(
-                          widget.product.inFavorites ?? true
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            widget.product.inFavorites =
-                                !(widget.product.inFavorites ?? true);
-                          });
-                          FavoritesRepositoryImplementation().addFavorite(
-                              widget.product.id!.toInt(),
-                              context,
-                              widget.isInHome,
-                              widget.reloadAll);
-                          if (widget.reloadAll) {
-                            context.read<GetFavoriteCubit>().getFavorites(context);
-                            context.read<ProductsCubit>().getProducts(context);
-                            context.read<CartCubit>().getCart(context);
-                          } else
-                          {
-                            if (widget.isInHome == null) {
-                              context.read<GetFavoriteCubit>().getFavorites(context);
-                              context.read<ProductsCubit>().getProducts(context);
-                            } else if (widget.isInHome!) {
-                              context.read<GetFavoriteCubit>().getFavorites(context);
-                              context.read<CartCubit>().getCart(context);
-                            } else {
-                              context.read<ProductsCubit>().getProducts(context);
-                              context.read<CartCubit>().getCart(context);
-                            }
-                          }
-                        },
-                      ),
-                    ),
+                    )
                   ],
                 ),
                 SizedBox(height: 8.h),

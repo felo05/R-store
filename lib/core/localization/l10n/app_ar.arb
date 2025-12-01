@@ -91,5 +91,7 @@
   "authentication_or_authorization_error": "خطأ فى المصادقة من فضلك حاول مرة اخرى.",
   "the_requested_resource_was_not_found": "المورد المطلوب غير موجود.",
   "unexpected_error_occurred": "حدث خطأ غير متوقع. من فضلك حاول مرة اخرى!",
-  "internal_server_error":"خطأ داخلى فى السيرفر. من فضلك حاول مرة اخرى لاحقا."
+  "internal_server_error":"خطأ داخلى فى السيرفر. من فضلك حاول مرة اخرى لاحقا.",
+    "please_select_all_fields": "من فضلك اختر كل الحقول",
+  "delivery_address": "عنوان التوصيل"
 }

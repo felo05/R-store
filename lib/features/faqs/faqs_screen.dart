@@ -4,7 +4,7 @@ import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/features/faqs/cubit/faqs_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 
 import 'model/faqs_model.dart';
 

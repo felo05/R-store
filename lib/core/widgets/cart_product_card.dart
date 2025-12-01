@@ -1,19 +1,19 @@
 import 'package:e_commerce/features/cart/model/cart_model.dart';
 import 'package:e_commerce/features/product_details/cubit/add_to_cart/add_to_cart_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../features/cart/cubit/get_cart/cart_cubit.dart';
 import '../../features/product_details/product_details_screen.dart';
+import '../localization/l10n/app_localizations.dart';
 import 'custom_network_image.dart';
 import 'custom_text.dart';
 
 class CartItemCard extends StatefulWidget {
   final CartItem cartItem;
-  final void Function(int) onChange;
-  final void Function(int) onRemoveAll;
+  final void Function(num) onChange;
+  final void Function(num) onRemoveAll;
 
   const CartItemCard({
     Key? key,
@@ -96,10 +96,10 @@ class _CartItemCardState extends State<CartItemCard> {
                           if (quantity > 1) {
                             quantity--;
                             widget.onChange(
-                                -widget.cartItem.product.price!.toInt());
+                                -widget.cartItem.product.price!);
                             CartCubit.changeQuantityCloudly(
                                 quantity: quantity,
-                                productId: widget.cartItem.product.id!.toInt());
+                                productId: widget.cartItem.id);
                             setState(() {});
                           }
                         },
@@ -119,10 +119,10 @@ class _CartItemCardState extends State<CartItemCard> {
                         onPressed: () {
                           quantity++;
                           widget
-                              .onChange(widget.cartItem.product.price!.toInt());
+                              .onChange(widget.cartItem.product.price!);
                           CartCubit.changeQuantityCloudly(
                             quantity: quantity,
-                            productId: widget.cartItem.id.toInt(),
+                            productId: widget.cartItem.id,
                           );
                           setState(() {});
                         },
@@ -136,11 +136,11 @@ class _CartItemCardState extends State<CartItemCard> {
                   TextButton(
                     onPressed: () {
                       AddToCartCubit.removeFromCart(
-                        productId: widget.cartItem.product.id!.toInt(),
+                        productId: widget.cartItem.product.id ?? widget.cartItem.id,
                         context: context,
                       );
                       widget.onRemoveAll(quantity*
-                          widget.cartItem.product.price!.toInt());
+                          widget.cartItem.product.price!);
                     },
                     child: CustomText(
                       text: AppLocalizations.of(context)!.remove,

@@ -1,8 +1,7 @@
-import 'package:e_commerce/features/add_address/model/address_model.dart';
 import 'package:e_commerce/features/cart/model/cart_model.dart';
 import 'package:e_commerce/features/checkout/cubit/checkout_cubit.dart';
 import 'package:e_commerce/core/constants/Kcolors.dart';
-import 'package:e_commerce/core/helpers/dio_helper.dart';
+import 'package:e_commerce/core/helpers/firebase_helper.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core//widgets/custom_dropdown.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
@@ -10,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 
 import '../add_address/map_screen.dart';
 import '../home/main_screen.dart';
@@ -29,17 +28,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final List<DropdownMenuItem<String>> addressItems = [];
   bool isLoadingAddresses = true;
 
+  // Move these to state class level
+  String? selectedPaymentMethod;
+  String? selectedAddress;
+
   @override
   void initState() {
     super.initState();
-    DioHelpers.getData(path: "addresses").then((value) {
-      final addressModel = AddressModel.fromJson(value.data);
+    _loadAddresses();
+  }
+
+  Future<void> _loadAddresses() async {
+    try {
+      if (FirebaseHelper.currentUserId == null) {
+        setState(() {
+          isLoadingAddresses = false;
+        });
+        return;
+      }
+
+      final snapshot = await FirebaseHelper.firestore
+          .collection(FirebaseHelper.usersCollection)
+          .doc(FirebaseHelper.currentUserId)
+          .collection(FirebaseHelper.addressesCollection)
+          .get();
+
       setState(() {
-        for (var address in addressModel.baseData!.addressData!) {
+        for (var doc in snapshot.docs) {
+          final addressData = doc.data();
           addressItems.add(DropdownMenuItem(
-            value: address.id.toString(),
+            value: doc.id,
             child: CustomText(
-              text: address.name!,
+              text: addressData['name'] ?? '',
               textSize: 16,
               textWeight: FontWeight.w500,
             ),
@@ -50,9 +70,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           alignment: Alignment.center,
           child: InkWell(
             onTap: () {
-              Get.to(() => const LocationPickerScreen());
+              Get.to(const LocationPickerScreen());
             },
-            child:  Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Center(
@@ -70,15 +90,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ));
         isLoadingAddresses = false;
       });
-    });
+    } catch (e) {
+      setState(() {
+        isLoadingAddresses = false;
+      });
+      // Handle error
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    int? selectedPaymentMethod;
-    int? selectedAddress;
     final List<DropdownMenuItem<String>> paymentMethodsItems = [
-       DropdownMenuItem(
+      DropdownMenuItem(
         value: "1",
         child: CustomText(
           text: AppLocalizations.of(context)!.cash_on_delivery,
@@ -86,7 +109,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           textWeight: FontWeight.w500,
         ),
       ),
-       DropdownMenuItem(
+      DropdownMenuItem(
         value: "2",
         child: CustomText(
           text: AppLocalizations.of(context)!.credit_card,
@@ -97,7 +120,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     ];
 
     return Scaffold(
-      appBar:  BackAppBar(
+      appBar: BackAppBar(
           title: AppLocalizations.of(context)!.checkout, color: baseColor, textColor: Colors.black),
       body: Padding(
         padding: EdgeInsets.all(16.0.r),
@@ -117,22 +140,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       return null;
                     },
                     onChanged: (value) {
-                      selectedPaymentMethod = int.parse(value!);
+                      setState(() {
+                        selectedPaymentMethod = value;
+                      });
                     },
                   ),
                   CustomDropdown(
                     label: AppLocalizations.of(context)!.address,
                     items: addressItems,
                     validator: (value) {
-                      if (value == null) {
+                      if (value == null || value == "null") {
                         return AppLocalizations.of(context)!.please_select_an_address;
                       }
                       return null;
                     },
                     onChanged: (value) {
-                      selectedAddress = int.parse(value!);
+                      if (value != "null") {
+                        setState(() {
+                          selectedAddress = value;
+                        });
+                      }
                     },
-                    isLoading: isLoadingAddresses, // Pass the loading state
+                    isLoading: isLoadingAddresses,
                   ),
                 ],
               ),
@@ -180,7 +209,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   CustomText(
+                  CustomText(
                       text: AppLocalizations.of(context)!.total_cost,
                       textSize: 18,
                       textWeight: FontWeight.bold),
@@ -202,7 +231,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ));
                   }
                   if (state is CheckoutSuccessState) {
-                    Get.offAll(() => const MainScreen(initialIndex: 0));
+                    Get.offAll( const MainScreen(initialIndex: 0));
                   }
                 },
                 builder: (context, state) {
@@ -216,10 +245,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   return InkWell(
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
-                        context.read<CheckoutCubit>().checkout(
-                            paymentMethod: selectedPaymentMethod!,
-                            context: context,
-                            addressId: selectedAddress!);
+                        // Safely parse to int with null checks
+
+                        if (selectedPaymentMethod != null && selectedAddress != null) {
+                          context.read<CheckoutCubit>().checkout(
+                              paymentMethod: selectedPaymentMethod!,
+                              context: context,
+                              addressId: selectedAddress!);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!.please_select_all_fields),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Container(
@@ -236,7 +276,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                         ],
                       ),
-                      child:  Center(
+                      child: Center(
                         child: CustomText(
                           text: AppLocalizations.of(context)!.checkout,
                           textColor: Colors.white,
