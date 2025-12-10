@@ -1,10 +1,9 @@
-import 'package:e_commerce/features//home/cubits/products/products_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
 
 import '../../features/home/models/products_model.dart';
-import '../../features/product_details/product_details_screen.dart';
+import '../../features/product_details/view/screens/product_details_screen.dart';
 import '../localization/l10n/app_localizations.dart';
 import 'custom_network_image.dart';
 import 'custom_text.dart';
@@ -34,23 +33,20 @@ class _ProductCardState extends State<ProductCard> {
       width: 200,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: GestureDetector(
-        onTap: () async {
-          if (widget.product.images!.isNotEmpty &&
-              widget.product.discount != null) {
-            Get.to( ProductDetailsScreen(product: widget.product));
+        onTap: () {
+          // Check if product has complete data
+          if (widget.product.images != null &&
+              widget.product.images!.isNotEmpty &&
+              widget.product.discount != null &&
+              widget.product.description != null) {
+            // Navigate with complete product data
+            Get.to(() => ProductDetailsScreen(product: widget.product));
           } else {
-            (await ProductsCubit.getAProduct(
-                    widget.product.id!.toInt(), context))
-                .fold((failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Colors.redAccent,
-                  content: Text(failure.errorMessage.toString()),
-                ),
-              );
-            }, (data) {
-              Get.to( ProductDetailsScreen(product: data));
-            });
+            // Navigate with product ID to fetch complete data
+            Get.to(() => ProductDetailsScreen(
+                  product: widget.product,
+                  productId: widget.product.id?.toInt(),
+                ));
           }
         },
         child: Card(

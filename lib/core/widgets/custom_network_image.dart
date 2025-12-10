@@ -20,6 +20,12 @@ class CustomNetworkImage extends StatelessWidget {
       imageUrl: image,
       height: height?.h,
       fit: fit ?? BoxFit.contain,
+      // Cache configuration for better performance
+      maxHeightDiskCache: 1000,
+      maxWidthDiskCache: 1000,
+      memCacheHeight: height != null ? (height! * 1.5).toInt() : null,
+      memCacheWidth: height != null ? (height! * 1.5).toInt() : null,
+      fadeInDuration: const Duration(milliseconds: 200),
       placeholder: (context, url) =>
           const Center(child: CircularProgressIndicator()),
       errorWidget: (context, url, error) =>

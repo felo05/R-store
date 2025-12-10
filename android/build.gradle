@@ -1,14 +1,13 @@
 buildscript {
-    ext.kotlin_version = '1.8.10' // Update the Kotlin version
+    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle:8.4.2" // Add AGP dependency
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Kotlin plugin
-        classpath 'com.google.gms:google-services:4.4.0' // Firebase Google Services
+        // Kotlin plugin - AGP and Google Services are managed via plugins DSL in settings.gradle
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -25,9 +24,6 @@ subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 
-subprojects {
-    project.evaluationDependsOn(':app') // This is usually not necessary unless you have a specific reason
-}
 
 // Task to clean the project
 tasks.register("clean", Delete) {

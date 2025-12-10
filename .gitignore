@@ -41,3 +41,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Release signing (DO NOT COMMIT!)
+**/key.properties
+**/*.jks
+**/*.keystore
+**/upload-keystore.jks
+
+# Firebase config (generated, but may contain sensitive info)
+# google-services.json is already tracked, but be careful with it
+

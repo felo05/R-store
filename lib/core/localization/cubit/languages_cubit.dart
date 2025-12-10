@@ -5,13 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:meta/meta.dart';
 
-import '../../helpers/hive_helper.dart';
+import '../../di/service_locator.dart';
+import '../../services/i_storage_service.dart';
 
 part 'languages_state.dart';
 
 final String defaultLocale = Platform.localeName;
 
 class LanguageCubit extends Cubit<LanguageState> {
+  final IStorageService _storageService = sl<IStorageService>();
+
   static Locale? _locale = cachedLanguage == null
       ? defaultLocale.substring(0, 2) == 'ar'
           ? const Locale('ar', '')
@@ -20,7 +23,7 @@ class LanguageCubit extends Cubit<LanguageState> {
 
   static String get currentLanguage => _locale!.toString();
 
-  static String? get cachedLanguage => HiveHelper.getLanguage();
+  static String? get cachedLanguage => sl<IStorageService>().getLanguage();
 
   LanguageCubit()
       : super(
@@ -29,19 +32,19 @@ class LanguageCubit extends Cubit<LanguageState> {
           ),
         ) {
     if (cachedLanguage == null) {
-      HiveHelper.setLanguage(defaultLocale.substring(0, 2));
+      _storageService.setLanguage(defaultLocale.substring(0, 2));
     }
   }
 
   void toArabic() {
     Get.updateLocale(const Locale("ar"));
-    HiveHelper.setLanguage('ar');
+    _storageService.setLanguage('ar');
     emit(SelectedLocale(_locale = const Locale('ar', '')));
   }
 
   void toEnglish() {
     Get.updateLocale(const Locale("en"));
-    HiveHelper.setLanguage('en');
+    _storageService.setLanguage('en');
     emit(SelectedLocale(_locale = const Locale('en', '')));
   }
 
