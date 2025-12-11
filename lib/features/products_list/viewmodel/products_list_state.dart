@@ -8,13 +8,13 @@ final class ProductsListInitial extends ProductsListState {}
 final class ProductsListLoadingState extends ProductsListState {}
 
 final class ProductsListLoadingMoreState extends ProductsListState {
-  final List<ProductData> currentProducts;
+  final List<PrototypeProductData> currentProducts;
 
   ProductsListLoadingMoreState(this.currentProducts);
 }
 
 final class ProductsListSuccessState extends ProductsListState {
-  final List<ProductData> products;
+  final List<PrototypeProductData> products;
   final dynamic lastDocument;
 
   ProductsListSuccessState(this.products, this.lastDocument);

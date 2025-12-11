@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:e_commerce/features/home/repository/i_home_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../product_details/model/product_model.dart';
 
 
 part 'products_state.dart';

@@ -1,12 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:e_commerce/features/product_details/repository/i_product_details_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/constants/firebase_constants.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
 import '../../../core/services/i_product_status_service.dart';
+import '../model/product_model.dart';
 
 class ProductDetailsRepository
     implements IProductDetailsRepository {
@@ -74,32 +75,25 @@ class ProductDetailsRepository
   }
 
   @override
-  Future<Either<String, ProductsModel>> getProducts(
+  Future<Either<String, PrototypeProductsModel>> getProducts(
       BuildContext context) async {
     try {
       final snapshot = await FirebaseConstants.firestore
           .collection(FirebaseConstants.productsCollection).limit(5)
           .get();
 
-      // Get user's favorites and cart status using centralized service
-      final statusMap = _productStatusService.getUserProductStatus();
-      final favoriteIds = statusMap['favorites']!;
-      final cartIds = statusMap['cart']!;
 
-      final products = snapshot.docs.map((doc) {
+      final List<PrototypeProductData> products = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
-        // Set inFavorites and inCart flags based on user's collections
-        data['in_favorites'] = favoriteIds.contains(doc.id);
-        data['in_cart'] = cartIds.contains(doc.id);
-        return data;
+        return  PrototypeProductData.fromJson(data);
       }).toList();
 
-      return Right(ProductsModel(
+      return Right(PrototypeProductsModel(
         status: true,
         message: null,
-        data: BaseProductData(
-          data: products.map((e) => ProductData.fromJson(e)).toList(),
+        data: BasePrototypeProductData(
+          data: products
         ),
       ));
     } catch (e) {

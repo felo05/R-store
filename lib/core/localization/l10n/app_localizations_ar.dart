@@ -306,4 +306,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get delivery_address => 'عنوان التوصيل';
+
+  @override
+  String get failed_to_get_address => 'فشل الحصول على العنوان';
+
+  @override
+  String get please_select_location_first => 'يرجى تحديد موقع أولاً';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get product_id_missing => 'معرف المنتج مفقود';
+
+  @override
+  String get error_initializing_app => 'خطأ في تهيئة التطبيق';
+
+  @override
+  String get loading => 'جاري التحميل...';
+
+  @override
+  String get error => 'خطأ';
 }

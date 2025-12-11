@@ -1,4 +1,4 @@
-import '../../home/models/products_model.dart';
+import '../../home/models/prototype_products_model.dart';
 
 class CartResponse {
   final bool? status;
@@ -36,7 +36,7 @@ class CartData {
 class CartItem {
   final String id;
   final int quantity;
-  final ProductData product;
+  final PrototypeProductData product;
 
   CartItem({required this.id, required this.quantity, required this.product});
 
@@ -44,7 +44,7 @@ class CartItem {
     return CartItem(
       id: json['id'],
       quantity: json['quantity'],
-      product: ProductData.fromJson(json['product']),
+      product: PrototypeProductData.fromJson(json['product']),
     );
   }
 }

@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/firebase_constants.dart';
 import '../../../core/services/i_error_handler_service.dart';
-import '../../../core/services/i_product_status_service.dart';
 import 'i_cart_repository.dart';
 
 class CartRepository implements ICartRepository {
   final IErrorHandlerService  _errorHandler;
-  final IProductStatusService _productStatusService;
 
-  CartRepository(this._errorHandler, this._productStatusService);
+  CartRepository(this._errorHandler);
 
   @override
   Future<Either<String, CartResponse>> getCartProducts(
@@ -35,18 +33,13 @@ class CartRepository implements ICartRepository {
         if (data['product'] != null) {
           final productId = data['product']['id'] ?? doc.id;
           data['product']['id'] = productId; // Ensure product has id
-          data['product']['in_favorites'] = _productStatusService.isInFavorite(productId);
-          data['product']['in_cart'] = true; // Always true since it's in cart
         }
-        return data;
+        return CartItem.fromJson(data);
       }).toList();
-
-      // Parse cart items
-      final parsedCartItems = cartItems.map((e) => CartItem.fromJson(e)).toList();
 
       // Calculate total from cart items
       num total = 0;
-      for (var item in parsedCartItems) {
+      for (var item in cartItems) {
         total += (item.product.price ?? 0) * item.quantity;
       }
 
@@ -54,7 +47,7 @@ class CartRepository implements ICartRepository {
         status: true,
         message: null,
         data: CartData(
-          cartItems: parsedCartItems,
+          cartItems: cartItems,
           total: total,
         ),
       ));

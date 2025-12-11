@@ -93,5 +93,12 @@
   "the_requested_resource_was_not_found": "The requested resource was not found.",
   "internal_server_error" : "Internal server error. Please try again later.",
   "please_select_all_fields": "Please select all fields",
-  "delivery_address": "Delivery Address"
+  "delivery_address": "Delivery Address",
+  "failed_to_get_address": "Failed to get address",
+  "please_select_location_first": "Please select a location first",
+  "retry": "Retry",
+  "product_id_missing": "Product ID is missing",
+  "error_initializing_app": "Error initializing app",
+  "loading": "Loading...",
+  "error": "Error"
 }

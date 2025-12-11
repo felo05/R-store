@@ -1,5 +1,5 @@
 import 'package:e_commerce/core/constants/kcolors.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +47,7 @@ class CategoryProductsScreen extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 );
               } else if (state is CategoryProductsSuccessState) {
-                List<ProductData> products = state.products;
+                List<PrototypeProductData> products = state.products;
                 return Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: ListView.builder(

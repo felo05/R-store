@@ -1,20 +1,18 @@
 import 'package:dartz/dartz.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:e_commerce/features/home/models/categories_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/firebase_constants.dart';
 import '../../../core/services/i_error_handler_service.dart';
-import '../../../core/services/i_product_status_service.dart';
 import 'i_categories_repository.dart';
 
 class CategoriesRepository implements ICategoriesRepository {
   final IErrorHandlerService _errorHandler;
-  final IProductStatusService _productStatusService;
 
 
-  CategoriesRepository(this._errorHandler, this._productStatusService);
+  CategoriesRepository(this._errorHandler);
 
   @override
   Future<Either<String, CategoriesResponse>> getCategories(
@@ -52,7 +50,7 @@ class CategoriesRepository implements ICategoriesRepository {
   }
 
   @override
-  Future<Either<String, List<ProductData>>> getCategoryProducts(
+  Future<Either<String, List<PrototypeProductData>>> getCategoryProducts(
       int categoryId, BuildContext context) async {
     try {
       final snapshot = await FirebaseConstants.firestore
@@ -60,17 +58,11 @@ class CategoriesRepository implements ICategoriesRepository {
           .where('category_id', isEqualTo: categoryId)
           .get();
 
-      // Get user's favorites and cart status using centralized service
-      final statusMap = _productStatusService.getUserProductStatus();
-      final favoriteIds = statusMap['favorites']!;
-      final cartIds = statusMap['cart']!;
 
       final products = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
-        data['in_favorites'] = favoriteIds.contains(doc.id);
-        data['in_cart'] = cartIds.contains(doc.id);
-        return ProductData.fromJson(data);
+        return PrototypeProductData.fromJson(data);
       }).toList();
 
       return Right(products);

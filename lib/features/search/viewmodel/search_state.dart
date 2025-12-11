@@ -16,12 +16,12 @@ final class SearchLoadingState extends SearchState {}
 final class SearchLoadingMoreState extends SearchState {
   SearchLoadingMoreState(this.currentProducts);
 
-  final BaseProductData currentProducts;
+  final BasePrototypeProductData currentProducts;
 }
 
 final class SearchSuccessState extends SearchState {
   SearchSuccessState(this.products, this.query);
 
-  final BaseProductData products;
+  final BasePrototypeProductData products;
   final String query; // Keep track of current search query
 }

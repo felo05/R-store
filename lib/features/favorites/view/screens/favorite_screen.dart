@@ -3,7 +3,6 @@ import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
 import 'package:e_commerce/core/widgets/skeleton_loaders.dart';
 import 'package:e_commerce/features/favorites/model/favorite_model.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/localization/l10n/app_localizations.dart';
@@ -107,24 +106,35 @@ class _FavoriteScreenState extends State<FavoriteScreen> with AutomaticKeepAlive
                   final List<FavoriteData> products = favoriteModel.data?.data ?? [];
 
                   if (products.isEmpty) {
-                    favoriteWidgets.add(
-                      Center(
-                        child: CustomText(
-                          text: AppLocalizations.of(context)!
-                              .no_favorite_products_added_yet,
-                          textSize: 18,
-                          textWeight: FontWeight.w500,
-                          textColor: baseColor,
+                    // Use SizedBox with full height to make the empty state scrollable
+                    return CustomScrollView(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: CustomText(
+                              text: AppLocalizations.of(context)!
+                                  .no_favorite_products_added_yet,
+                              textSize: 18,
+                              textWeight: FontWeight.w500,
+                              textColor: baseColor,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     );
                   } else {
                     favoriteWidgets = products.map<Widget>((favoriteProduct) {
-                      return ProductCard(
-                        isInHome: false,
-                        product: favoriteProduct.product ?? ProductData(),
-                        height: 150,
-                        reloadAll: false,
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: ProductCard(
+                          isInHome: false,
+                          product: favoriteProduct.product!,
+                          height: 150,
+                          reloadAll: false,
+                        ),
                       );
                     }).toList();
 
@@ -144,6 +154,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> with AutomaticKeepAlive
 
                 return ListView(
                   controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16.0),
                   children: favoriteWidgets,
                 );

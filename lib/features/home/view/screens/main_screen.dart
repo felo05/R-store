@@ -1,15 +1,10 @@
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/features/cart/view/screens/cart_screen.dart';
 import 'package:e_commerce/features/favorites/view/screens/favorite_screen.dart';
-import 'package:e_commerce/features/home/repository/i_home_repository.dart';
 import 'package:e_commerce/features/home/view/screens/home_screen.dart';
 import 'package:e_commerce/features/profile/view/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_drop_nav_bar/water_drop_nav_bar.dart';
-import 'package:e_commerce/features/home/viewmodel/categories/categories_cubit.dart';
-
-import '../../../../core/di/service_locator.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -26,14 +21,7 @@ class _MainScreen extends State<MainScreen> {
   late int selectedIndex;
 
   final List<Widget> _screens = [
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => CategoriesCubit(sl<IHomeRepository>())..getCategories(context),
-        ),
-      ],
-      child: const HomeScreen(),
-    ),
+    const HomeScreen(),
     const FavoriteScreen(),
     const CartScreen(),
     const ProfileScreen(),

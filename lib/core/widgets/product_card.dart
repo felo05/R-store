@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../features/home/models/products_model.dart';
+import '../../features/home/models/prototype_products_model.dart';
 import '../../core/routes/app_routes.dart';
 import '../localization/l10n/app_localizations.dart';
 import 'custom_network_image.dart';
@@ -17,7 +17,7 @@ class ProductCard extends StatefulWidget {
   });
 
   final double height;
-  final ProductData product;
+  final PrototypeProductData product;
   final bool? isInHome;
   final bool reloadAll;
 
@@ -42,8 +42,7 @@ class _ProductCardState extends State<ProductCard> {
               context,
               AppRoutes.productDetails,
               arguments: ProductDetailsArguments(
-                product: widget.product,
-                productId: widget.product.id,
+                productId: widget.product.id!,
               ),
             );
           },

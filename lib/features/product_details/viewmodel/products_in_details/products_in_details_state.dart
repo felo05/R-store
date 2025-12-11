@@ -13,6 +13,6 @@ final class ProductsInDetailsErrorState extends ProductsInDetailsState {
 final class ProductsInDetailsLoadingState extends ProductsInDetailsState {}
 
 final class ProductsInDetailsSuccessState extends ProductsInDetailsState {
-  final ProductsModel productsModel;
+  final PrototypeProductsModel productsModel;
   ProductsInDetailsSuccessState(this.productsModel);
 }

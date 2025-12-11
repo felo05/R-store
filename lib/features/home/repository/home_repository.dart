@@ -4,19 +4,18 @@ import 'package:dartz/dartz.dart';
 import 'package:e_commerce/features/home/models/banner_model.dart';
 
 import 'package:e_commerce/features/home/models/categories_model.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/constants/firebase_constants.dart';
 import 'package:e_commerce/features/home/repository/i_home_repository.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
-import '../../../core/services/i_product_status_service.dart';
+import '../../product_details/model/product_model.dart';
 
 class HomeRepository implements IHomeRepository {
   final IErrorHandlerService  _errorHandler;
-  final IProductStatusService _productStatusService;
 
-  HomeRepository(this._errorHandler, this._productStatusService);
+  HomeRepository(this._errorHandler);
 
   @override
   Future<Either<String, BannerModel>> getBanners(BuildContext context) async{
@@ -25,12 +24,12 @@ class HomeRepository implements IHomeRepository {
           .collection(FirebaseConstants.bannersCollection)
           .get();
 
-      final banners = snapshot.docs.map((doc) => doc.data()).toList();
+      final List<BannerData> banners = snapshot.docs.map((doc) => BannerData.fromJson(doc.data())).toList();
 
       return Right(BannerModel(
         status: true,
         message: null,
-        data: banners.map((e) => BannerData.fromJson(e)).toList(),
+        data: banners,
       ));
     }catch(e){
       return Left(_errorHandler.errorHandler(e.toString(),context));
@@ -44,13 +43,13 @@ class HomeRepository implements IHomeRepository {
           .collection(FirebaseConstants.categoriesCollection).limit(4)
           .get();
 
-      final categories = snapshot.docs.map((doc) => doc.data()).toList();
+      final List<CategoriesData> categories = snapshot.docs.map((doc) => CategoriesData.fromJson(doc.data())).toList();
 
       return Right(CategoriesModel(
         status: true,
         message: null,
         data: BaseData(
-          data: categories.map((e) => CategoriesData.fromJson(e)).toList(),
+          data: categories,
         ),
       ));
     }
@@ -60,28 +59,20 @@ class HomeRepository implements IHomeRepository {
   }
 
   @override
-  Future<Either<String, BaseProductData>> getProducts(BuildContext context)async {
+  Future<Either<String, BasePrototypeProductData>> getProducts(BuildContext context)async {
     try{
       final snapshot = await FirebaseConstants.firestore
           .collection(FirebaseConstants.productsCollection).limit(5)
           .get();
 
-      // Get user's favorites and cart status using centralized service
-      final statusMap = _productStatusService.getUserProductStatus();
-      final favoriteIds = statusMap['favorites']!;
-      final cartIds = statusMap['cart']!;
-
-      final products = snapshot.docs.map((doc) {
+      final List<PrototypeProductData> products = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
-        // Set inFavorites and inCart flags based on user's collections
-        data['in_favorites'] = favoriteIds.contains(doc.id);
-        data['in_cart'] = cartIds.contains(doc.id);
-        return data;
+        return PrototypeProductData.fromJson(data);
       }).toList();
 
-      return Right(BaseProductData(
-        data: products.map((e) => ProductData.fromJson(e)).toList(),
+      return Right(BasePrototypeProductData(
+        data: products,
       ));
     }
     catch(e){

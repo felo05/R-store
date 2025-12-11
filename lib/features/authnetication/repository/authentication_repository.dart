@@ -118,6 +118,7 @@ class AuthenticationRepository implements IAuthenticationRepository {
         image: null,
         token: userCredential.user!.uid,
       );
+      _productStatusService.fetchFavoritesAndCart();
 
       return Right(ProfileModel(
         status: true,

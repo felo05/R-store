@@ -1,4 +1,4 @@
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 
 // Response wrapper for pagination
 class ProductsListResponse {
@@ -7,7 +7,7 @@ class ProductsListResponse {
     this.lastDocument,
   });
 
-  List<ProductData>? products;
+  List<PrototypeProductData>? products;
   dynamic lastDocument; // For pagination
 }
 

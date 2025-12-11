@@ -45,13 +45,10 @@ class FavoritesRepository implements IFavoritesRepository {
       final favorites = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
-        // Update product data with correct flags and ensure id is set
         if (data['product'] != null && data['product'] is Map) {
           final product = data['product'] as Map<String, dynamic>;
           final productId = product['id'] ?? doc.id;
           product['id'] = productId; // Ensure product has id
-          product['in_favorites'] = true; // Always true since it's in favorites
-          product['in_cart'] = _productStatusService.isInCart(productId);
           data['product'] = product;
         }
         return FavoriteData.fromJson(data);

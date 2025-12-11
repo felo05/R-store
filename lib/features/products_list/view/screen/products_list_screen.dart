@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/Kcolors.dart';
-import '../../../home/models/products_model.dart';
+import '../../../home/models/prototype_products_model.dart';
 
 class ProductsListScreen extends StatefulWidget {
   const ProductsListScreen({super.key});
@@ -94,7 +94,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     }
 
     if (state is ProductsListSuccessState || state is ProductsListLoadingMoreState) {
-      List<ProductData> products;
+      List<PrototypeProductData> products;
       bool showLoadingMore = false;
 
       if (state is ProductsListSuccessState) {
@@ -134,11 +134,14 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
               ),
             );
           }
-          return ProductCard(
-            product: products[index],
-            height: 200,
-            isInHome: false,
-            reloadAll: true,
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ProductCard(
+              product: products[index],
+              height: 200,
+              isInHome: false,
+              reloadAll: true,
+            ),
           );
         },
         physics: const AlwaysScrollableScrollPhysics(),

@@ -16,61 +16,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:e_commerce/core/widgets/horizontal_products_header.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
 import 'package:e_commerce/features/favorites/viewmodel/get_favorite_cubit.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
 
 import '../../../../core/widgets/skeleton_loaders.dart';
+import '../../model/product_model.dart';
 import '../../repository/i_product_details_repository.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
-  final ProductData? product;
-  final String? productId;
+  final String productId;
 
   const ProductDetailsScreen({
     super.key,
-    this.product,
-    this.productId,
-  }) : assert(product != null || productId != null,
-            'Either product or productId must be provided');
+    required this.productId,
+  });
 
-  bool _needsDataFetch() {
-    return product == null ||
-        product!.images == null ||
-        product!.images!.isEmpty ||
-        product!.discount == null ||
-        product!.description == null;
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    // Wrap with AddToCartCubit provider
     return BlocProvider(
       create: (context) => AddToCartCubit(sl<IProductDetailsRepository>()),
       child: Builder(
         builder: (context) {
-          // If we need to fetch data, use BlocProvider with GetProductCubit
-          if (_needsDataFetch()) {
-            final idToFetch = productId ?? product!.id;
-            if (idToFetch == null) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: CustomText(
-                    text: AppLocalizations.of(context)!.product_details,
-                    textSize: 22,
-                    textColor: Colors.black,
-                    textWeight: FontWeight.bold,
-                  ),
-                ),
-                body: const Center(
-                  child: CustomText(
-                    text: 'Invalid product ID',
-                    textSize: 16,
-                    textColor: Colors.red,
-                    textWeight: FontWeight.bold,
-                  ),
-                ),
-              );
-            }
-
+            final idToFetch = productId;
             return BlocProvider(
               create: (context) => GetProductCubit(sl<IProductDetailsRepository>())
                 ..getProduct(idToFetch, context),
@@ -115,7 +82,7 @@ class ProductDetailsScreen extends StatelessWidget {
                                     .read<GetProductCubit>()
                                     .getProduct(idToFetch, context);
                               },
-                              child: const Text('Retry'),
+                              child: Text(AppLocalizations.of(context)!.retry),
                             ),
                           ],
                         ),
@@ -128,10 +95,6 @@ class ProductDetailsScreen extends StatelessWidget {
                 },
               ),
             );
-          }
-
-          // If we have complete product data, render directly
-          return _ProductDetailsContent(product: product!);
         },
       ),
     );
@@ -372,7 +335,7 @@ class _FavoriteIconState extends State<_FavoriteIcon> {
         final productId = widget.product.id?.toString() ?? '';
         if (productId.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Product ID is missing')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.product_id_missing)),
           );
           return;
         }

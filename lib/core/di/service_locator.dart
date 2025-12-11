@@ -59,7 +59,7 @@ Future<void> initServiceLocator() async {
 
   // Home Repository
   sl.registerLazySingleton<IHomeRepository>(
-        () => HomeRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
+        () => HomeRepository(sl<IErrorHandlerService>()),
   );
 
   // Favorites Repository
@@ -74,7 +74,7 @@ Future<void> initServiceLocator() async {
 
   // Cart Repository
   sl.registerLazySingleton<ICartRepository>(
-        () => CartRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
+        () => CartRepository(sl<IErrorHandlerService>(), ),
   );
 
   // Authentication Repository
@@ -114,7 +114,7 @@ Future<void> initServiceLocator() async {
 
   // Search Repository
   sl.registerLazySingleton<ISearchRepository>(
-        () => SearchRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
+        () => SearchRepository(sl<IErrorHandlerService>()),
   );
 
   // FAQs Repository
@@ -124,7 +124,7 @@ Future<void> initServiceLocator() async {
 
   // Category Products Repository
   sl.registerLazySingleton<ICategoriesRepository>(
-        () => CategoriesRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
+        () => CategoriesRepository(sl<IErrorHandlerService>()),
   );
 
   // Add Address Repository
@@ -134,7 +134,7 @@ Future<void> initServiceLocator() async {
 
   // Products List Repository
   sl.registerLazySingleton<IProductsListRepository>(
-        () => ProductsListRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
+        () => ProductsListRepository(sl<IErrorHandlerService>()),
   );
 
 }

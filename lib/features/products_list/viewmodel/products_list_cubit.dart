@@ -1,8 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 
-import '../../home/models/products_model.dart';
+import '../../home/models/prototype_products_model.dart';
 import '../repository/i_product_list_repository.dart';
 
 part 'products_list_state.dart';
@@ -26,7 +25,7 @@ class ProductsListCubit extends Cubit<ProductsListState> {
     );
   }
 
-  Future<void> loadMoreProducts(BuildContext context, List<ProductData> currentProducts, dynamic lastDocument) async {
+  Future<void> loadMoreProducts(BuildContext context, List<PrototypeProductData> currentProducts, dynamic lastDocument) async {
     if (lastDocument == null) return;
 
     emit(ProductsListLoadingMoreState(currentProducts));
@@ -36,7 +35,7 @@ class ProductsListCubit extends Cubit<ProductsListState> {
         emit(ProductsListSuccessState(currentProducts, lastDocument)); // Keep current data on error
       },
       (response) {
-        final List<ProductData> allProducts = [...currentProducts, ...(response.products ?? <ProductData>[])];
+        final List<PrototypeProductData> allProducts = [...currentProducts, ...(response.products ?? <PrototypeProductData>[])];
         emit(ProductsListSuccessState(allProducts, response.lastDocument));
       }
     );

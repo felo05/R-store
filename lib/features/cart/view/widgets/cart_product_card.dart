@@ -49,8 +49,7 @@ class _CartItemCardState extends State<CartItemCard> {
             context,
             AppRoutes.productDetails,
             arguments: ProductDetailsArguments(
-              product: widget.cartItem.product,
-              productId: widget.cartItem.product.id,
+              productId: widget.cartItem.product.id!,
             ),
           );
         },

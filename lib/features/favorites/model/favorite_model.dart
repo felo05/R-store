@@ -1,4 +1,4 @@
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 
 class FavoriteModel {
   FavoriteModel({
@@ -47,10 +47,10 @@ class FavoriteData {
   FavoriteData.fromJson(dynamic json) {
     id = json['id'];
     product = json['product'] != null
-        ? ProductData.fromJson(json['product'])
+        ? PrototypeProductData.fromJson(json['product'])
         : null;
   }
 
   String? id;
-  ProductData? product;
+  PrototypeProductData? product;
 }

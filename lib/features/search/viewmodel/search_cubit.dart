@@ -1,7 +1,7 @@
 import 'package:e_commerce/features/search/repository/i_search_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 
 part 'search_state.dart';
 
@@ -20,7 +20,7 @@ class SearchCubit extends Cubit<SearchState> {
     });
   }
 
-  Future<void> loadMoreSearchResults(String query, BuildContext context, BaseProductData currentData) async {
+  Future<void> loadMoreSearchResults(String query, BuildContext context, BasePrototypeProductData currentData) async {
     if (currentData.lastDocument == null) return;
 
     emit(SearchLoadingMoreState(currentData));
@@ -30,8 +30,8 @@ class SearchCubit extends Cubit<SearchState> {
         emit(SearchSuccessState(currentData, query)); // Keep current data on error
       },
       (newData) {
-        final List<ProductData> allProducts = [...(currentData.data ?? <ProductData>[]), ...(newData.data ?? <ProductData>[])];
-        final mergedData = BaseProductData(
+        final List<PrototypeProductData> allProducts = [...(currentData.data ?? <PrototypeProductData>[]), ...(newData.data ?? <PrototypeProductData>[])];
+        final mergedData = BasePrototypeProductData(
           data: allProducts,
           lastDocument: newData.lastDocument,
         );

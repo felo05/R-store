@@ -667,6 +667,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delivery Address'**
   String get delivery_address;
+
+  /// No description provided for @failed_to_get_address.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to get address'**
+  String get failed_to_get_address;
+
+  /// No description provided for @please_select_location_first.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a location first'**
+  String get please_select_location_first;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @product_id_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Product ID is missing'**
+  String get product_id_missing;
+
+  /// No description provided for @error_initializing_app.
+  ///
+  /// In en, this message translates to:
+  /// **'Error initializing app'**
+  String get error_initializing_app;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
 }
 
 class _AppLocalizationsDelegate

@@ -10,6 +10,8 @@ import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
 import 'package:e_commerce/features/authnetication/register/viewmodel/register_cubit.dart';
 
+import '../../../../home/view/screens/main_screen.dart';
+
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
@@ -151,11 +153,7 @@ class RegisterScreen extends StatelessWidget {
                           );
                         }
                         if (state is RegisterSuccessState) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRoutes.home,
-                            (route) => false,
-                          );
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen(initialIndex: 0,)));
                         }
                       },
                       builder: (context, state) {

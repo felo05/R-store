@@ -95,7 +95,7 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
         debugPrint("Error during reverse geocoding: $e");
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to get address: $e")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.failed_to_get_address)),
       );
     }
   }
@@ -198,8 +198,8 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text("Please select a location first")),
+                  SnackBar(
+                      content: Text(AppLocalizations.of(context)!.please_select_location_first)),
                 );
               }
             },

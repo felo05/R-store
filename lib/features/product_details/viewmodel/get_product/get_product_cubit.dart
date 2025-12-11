@@ -1,7 +1,8 @@
 import 'package:e_commerce/features/product_details/repository/i_product_details_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+
+import '../../model/product_model.dart';
 
 part 'get_product_state.dart';
 

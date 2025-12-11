@@ -10,6 +10,8 @@ import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
 import 'package:e_commerce/core/widgets/login_and_register_header.dart';
 
+import '../../../../home/view/screens/main_screen.dart';
+
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
@@ -84,23 +86,6 @@ class LoginScreen extends StatelessWidget {
                             return null;
                           },
                         ),
-                        Row(
-                          children: [
-                            const Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: GestureDetector(
-                                onTap: () {},
-                                child: CustomText(
-                                  text: AppLocalizations.of(context)!.forgot_password,
-                                  textColor: baseColor,
-                                  textWeight: FontWeight.w300,
-                                  textSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -114,11 +99,7 @@ class LoginScreen extends StatelessWidget {
                       ));
                     }
                     if (state is LoginSuccessState) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.home,
-                        (route) => false,
-                      );
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen(initialIndex: 0,)));
                     }
                   },
                   builder: (context, state) {

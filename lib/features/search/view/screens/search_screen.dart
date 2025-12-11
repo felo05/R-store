@@ -1,6 +1,6 @@
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/core/widgets/skeleton_loaders.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
@@ -109,7 +109,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                   );
                 }
                 if (state is SearchSuccessState || state is SearchLoadingMoreState) {
-                  BaseProductData products;
+                  BasePrototypeProductData products;
                   bool showLoadingMore = false;
 
                   if (state is SearchSuccessState) {

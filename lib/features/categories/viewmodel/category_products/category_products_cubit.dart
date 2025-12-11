@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../home/models/products_model.dart';
+import '../../../home/models/prototype_products_model.dart';
 import '../../repository/i_categories_repository.dart';
 
 part 'category_products_state.dart';

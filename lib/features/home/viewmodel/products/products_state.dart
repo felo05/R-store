@@ -6,7 +6,7 @@ sealed class ProductsState {}
 final class ProductsInitial extends ProductsState {}
 
 final class ProductsSuccessState extends ProductsState {
-  final BaseProductData productData;
+  final BasePrototypeProductData productData;
   ProductsSuccessState(this.productData);
 }
 

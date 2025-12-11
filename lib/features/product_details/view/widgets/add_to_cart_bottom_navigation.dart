@@ -1,4 +1,3 @@
-import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:e_commerce/features/product_details/viewmodel/add_to_cart/add_to_cart_cubit.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import '../../../cart/viewmodel/get_cart/cart_cubit.dart';
 import '../../../../core/localization/l10n/app_localizations.dart';
 import '../../../favorites/viewmodel/get_favorite_cubit.dart';
 import '../../../home/viewmodel/products/products_cubit.dart';
+import '../../model/product_model.dart';
 
 class AddToCartBottomNavigation extends StatefulWidget {
   const AddToCartBottomNavigation({

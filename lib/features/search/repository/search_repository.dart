@@ -1,25 +1,23 @@
 import 'package:dartz/dartz.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
+import 'package:e_commerce/features/home/models/prototype_products_model.dart';
 import 'package:e_commerce/features/search/repository/i_search_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/constants/firebase_constants.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
-import '../../../core/services/i_product_status_service.dart';
 
 class SearchRepository implements ISearchRepository {
   final IErrorHandlerService _errorHandler;
-  final IProductStatusService _productStatusService;
 
-  SearchRepository(this._errorHandler, this._productStatusService);
+  SearchRepository(this._errorHandler);
 
   @override
-  Future<Either<String, BaseProductData>> search(
+  Future<Either<String, BasePrototypeProductData>> search(
       String query, BuildContext context, {int? limit, dynamic lastDocument}) async {
     try {
       if (query.isEmpty) {
-        return Right(BaseProductData(data: [], lastDocument: null));
+        return Right(BasePrototypeProductData(data: [], lastDocument: null));
       }
 
       final searchQuery = query.toLowerCase().trim();
@@ -30,18 +28,12 @@ class SearchRepository implements ISearchRepository {
 
       final snapshot = await queryRef.get();
 
-      // Get user's favorites and cart status using centralized service
-      final statusMap = _productStatusService.getUserProductStatus();
-      final favoriteIds = statusMap['favorites']!;
-      final cartIds = statusMap['cart']!;
 
       // Map all products
-      final allProducts = snapshot.docs.map((doc) {
+      final List<PrototypeProductData> allProducts = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
-        data['in_favorites'] = favoriteIds.contains(doc.id);
-        data['in_cart'] = cartIds.contains(doc.id);
-        return ProductData.fromJson(data);
+        return PrototypeProductData.fromJson(data);
       }).toList();
 
       // Client-side filter: Keep only products where name CONTAINS the search query (case-insensitive)
@@ -73,7 +65,7 @@ class SearchRepository implements ISearchRepository {
           ? paginatedProducts.last.id
           : null;
 
-      return Right(BaseProductData(
+      return Right(BasePrototypeProductData(
         data: paginatedProducts,
         lastDocument: lastDocId,
       ));

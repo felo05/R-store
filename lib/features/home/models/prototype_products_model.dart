@@ -1,64 +1,57 @@
-class ProductsModel {
-  ProductsModel({
+class PrototypeProductsModel {
+  PrototypeProductsModel({
     this.status,
     this.message,
     this.data,
   });
 
-  ProductsModel.fromJson(dynamic json) {
+  PrototypeProductsModel.fromJson(dynamic json) {
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? BaseProductData.fromJson(json['data']) : null;
+    data = json['data'] != null ? BasePrototypeProductData.fromJson(json['data']) : null;
   }
   bool? status;
   dynamic message;
-  BaseProductData? data;
+  BasePrototypeProductData? data;
 }
 
-class BaseProductData {
-  BaseProductData({
+class BasePrototypeProductData {
+  BasePrototypeProductData({
     this.data,
     this.lastDocument,
   });
 
-  BaseProductData.fromJson(dynamic json) {
+  BasePrototypeProductData.fromJson(dynamic json) {
     if (json['data'] != null) {
       data = [];
       json['data'].forEach((v) {
-        data?.add(ProductData.fromJson(v));
+        data?.add(PrototypeProductData.fromJson(v));
       });
     }
     lastDocument = json['lastDocument'];
   }
-  List<ProductData>? data;
+  List<PrototypeProductData>? data;
   dynamic lastDocument; // For pagination
 }
 
-class ProductData {
-  ProductData({
+
+class PrototypeProductData {
+  PrototypeProductData({
     this.id,
     this.price,
     this.oldPrice,
     this.discount,
     this.image,
     this.name,
-    this.description,
-    this.images,
-    this.inFavorites,
-    this.inCart,
   });
 
-  ProductData.fromJson(dynamic json) {
+  PrototypeProductData.fromJson(dynamic json) {
     id = json['id'];
     price = json['price'];
     oldPrice = json['old_price'];
     discount = json['discount'];
     image = json['image'];
     name = json['name'];
-    description = json['description'];
-    images = json['images'] != null ? json['images'].cast<String>() : [];
-    inFavorites = json['in_favorites'];
-    inCart = json['in_cart'];
   }
   String? id; // Changed to dynamic to support both num and String (Firestore document ID)
   num? price;
@@ -66,8 +59,4 @@ class ProductData {
   num? discount;
   String? image;
   String? name;
-  String? description;
-  List<String>? images;
-  bool? inFavorites;
-  bool? inCart;
 }

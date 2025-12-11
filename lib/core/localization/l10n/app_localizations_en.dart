@@ -303,4 +303,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get delivery_address => 'Delivery Address';
+
+  @override
+  String get failed_to_get_address => 'Failed to get address';
+
+  @override
+  String get please_select_location_first => 'Please select a location first';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get product_id_missing => 'Product ID is missing';
+
+  @override
+  String get error_initializing_app => 'Error initializing app';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get error => 'Error';
 }

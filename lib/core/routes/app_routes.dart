@@ -16,7 +16,6 @@ import 'package:e_commerce/features/change_password/view/screens/change_password
 import 'package:e_commerce/features/add_address/view/screens/complete_adding.dart';
 import 'package:e_commerce/features/add_address/view/screens/map_screen.dart';
 import 'package:e_commerce/features/checkout/view/screens/checkout_screen.dart';
-import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:e_commerce/features/cart/model/cart_model.dart';
 import 'package:e_commerce/features/profile/model/profile_model.dart';
 import 'package:latlong2/latlong.dart';
@@ -65,7 +64,6 @@ class AppRoutes {
         }
         return MaterialPageRoute(
           builder: (_) => ProductDetailsScreen(
-            product: args.product,
             productId: args.productId,
           ),
         );
@@ -154,9 +152,9 @@ class AppRoutes {
   /// Error route for undefined routes
   static Route<dynamic> _errorRoute(String message) {
     return MaterialPageRoute(
-      builder: (_) => Scaffold(
+      builder: (context) => Scaffold(
         appBar: AppBar(
-          title: const Text('Error'),
+          title: const Text('Error'), // Static route - no localization context available
         ),
         body: Center(
           child: Text(message),
@@ -168,14 +166,11 @@ class AppRoutes {
 
 /// Arguments for ProductDetailsScreen
 class ProductDetailsArguments {
-  final ProductData? product;
-  final String? productId;
+  final String productId;
 
   ProductDetailsArguments({
-    this.product,
-    this.productId,
-  }) : assert(product != null || productId != null,
-            'Either product or productId must be provided');
+    required this.productId,
+  }) ;
 }
 
 /// Arguments for CategoryProductsScreen

@@ -54,8 +54,7 @@ class AppInitializer {
         _initializeServiceLocatorWithScheduling(),
         _initializeStorageWithScheduling(),
       ]);
-      final result=await sl<IProductStatusService>().fetchFavoritesAndCart();
-      result.fold((error) => throw Exception(error), (_) => null);
+      await sl<IProductStatusService>().fetchFavoritesAndCart();
 
 
       _isInitialized = true;

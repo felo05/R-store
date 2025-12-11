@@ -15,7 +15,7 @@ final class CategoryProductsErrorState extends CategoryProductsState {
 
 final class CategoryProductsSuccessState extends CategoryProductsState {
 
-  final List<ProductData> products;
+  final List<PrototypeProductData> products;
 
   CategoryProductsSuccessState(this.products);
 }
