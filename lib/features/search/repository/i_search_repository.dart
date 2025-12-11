@@ -4,6 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 
 abstract class ISearchRepository {
-  Future<Either<String,BaseProductData>> search(String query,BuildContext context);
+  Future<Either<String,BaseProductData>> search(String query, BuildContext context, {int? limit, dynamic lastDocument});
 }
 

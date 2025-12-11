@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 abstract class IProductDetailsRepository {
   Future<Either<String, ProductsModel>> getProducts(BuildContext context);
 
-  Future<Either<String, ProductData>> getProduct(int productId, BuildContext context);
+  Future<Either<String, ProductData>> getProduct(String productId, BuildContext context);
 
   Future<Either<String, Unit>> addToCart(
     String productId,

@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:e_commerce/core/constants/firebase_constants.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
+import '../../../core/services/i_product_status_service.dart';
 
 class ProductDetailsRepository
     implements IProductDetailsRepository {
   final IErrorHandlerService  _errorHandler;
+  final IProductStatusService _productStatusService;
 
-  ProductDetailsRepository(this._errorHandler);
+  ProductDetailsRepository(this._errorHandler, this._productStatusService);
 
   @override
   Future<Either<String, Unit>> addToCart(
@@ -42,6 +44,7 @@ class ProductDetailsRepository
         'quantity': quantity ?? 1,
         'addedAt': FieldValue.serverTimestamp(),
       });
+      _productStatusService.addProductToCart(productId);
 
       return right(unit);
     } catch (e) {
@@ -62,6 +65,7 @@ class ProductDetailsRepository
           .collection(FirebaseConstants.cartCollection)
           .doc(productId)
           .delete();
+      _productStatusService.removeProductFromCart(productId);
 
       return right(unit);
     } catch (e) {
@@ -74,32 +78,13 @@ class ProductDetailsRepository
       BuildContext context) async {
     try {
       final snapshot = await FirebaseConstants.firestore
-          .collection(FirebaseConstants.productsCollection)
+          .collection(FirebaseConstants.productsCollection).limit(5)
           .get();
 
-      // Get user's favorites and cart if logged in
-      Set<String> favoriteIds = {};
-      Set<String> cartIds = {};
-
-      if (FirebaseConstants.currentUserId != null) {
-        // Fetch user's favorites
-        final favoritesSnapshot = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.favoritesCollection)
-            .get();
-
-        favoriteIds = favoritesSnapshot.docs.map((doc) => doc.id).toSet();
-
-        // Fetch user's cart
-        final cartSnapshot = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.cartCollection)
-            .get();
-
-        cartIds = cartSnapshot.docs.map((doc) => doc.id).toSet();
-      }
+      // Get user's favorites and cart status using centralized service
+      final statusMap = _productStatusService.getUserProductStatus();
+      final favoriteIds = statusMap['favorites']!;
+      final cartIds = statusMap['cart']!;
 
       final products = snapshot.docs.map((doc) {
         final data = doc.data();
@@ -124,7 +109,7 @@ class ProductDetailsRepository
 
   @override
   Future<Either<String, ProductData>> getProduct(
-      int productId, BuildContext context) async {
+      String productId, BuildContext context) async {
     try {
       final productDoc = await FirebaseConstants.firestore
           .collection(FirebaseConstants.productsCollection)
@@ -138,29 +123,10 @@ class ProductDetailsRepository
       final data = productDoc.data()!;
       data['id'] = productDoc.id;
 
-      // Check if product is in favorites and cart
-      if (FirebaseConstants.currentUserId != null) {
-        final favoriteDoc = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.favoritesCollection)
-            .doc(productId.toString())
-            .get();
-
-        data['in_favorites'] = favoriteDoc.exists;
-
-        final cartDoc = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.cartCollection)
-            .doc(productId.toString())
-            .get();
-
-        data['in_cart'] = cartDoc.exists;
-      } else {
-        data['in_favorites'] = false;
-        data['in_cart'] = false;
-      }
+      // Check if product is in favorites and cart using centralized service
+      final status = _productStatusService.checkProductStatus(productId.toString());
+      data['in_favorites'] = status['inFavorites']!;
+      data['in_cart'] = status['inCart']!;
 
       return Right(ProductData.fromJson(data));
     } catch (e) {

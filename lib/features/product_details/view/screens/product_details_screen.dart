@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/features/favorites/repository/i_favorites_repository.dart';
 import 'package:e_commerce/features/product_details/view/widgets/add_to_cart_bottom_navigation.dart';
 import 'package:e_commerce/core/widgets/custom_network_image.dart';
@@ -17,11 +18,12 @@ import 'package:e_commerce/core/widgets/product_card.dart';
 import 'package:e_commerce/features/favorites/viewmodel/get_favorite_cubit.dart';
 import 'package:e_commerce/features/home/models/products_model.dart';
 
+import '../../../../core/widgets/skeleton_loaders.dart';
 import '../../repository/i_product_details_repository.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   final ProductData? product;
-  final int? productId;
+  final String? productId;
 
   const ProductDetailsScreen({
     super.key,
@@ -47,7 +49,7 @@ class ProductDetailsScreen extends StatelessWidget {
         builder: (context) {
           // If we need to fetch data, use BlocProvider with GetProductCubit
           if (_needsDataFetch()) {
-            final idToFetch = productId ?? product!.id?.toInt();
+            final idToFetch = productId ?? product!.id;
             if (idToFetch == null) {
               return Scaffold(
                 appBar: AppBar(
@@ -285,7 +287,7 @@ class _ProductDetailsContent extends StatelessWidget {
                   textAlign: TextAlign.justify),
               SizedBox(height: 20.h),
               HorizontalProductsHeader(
-                  text: AppLocalizations.of(context)!.similar_products),
+                  text: AppLocalizations.of(context)!.similar_products,onPressed: ()=>Navigator.pushNamed(context, AppRoutes.productsList),),
               SizedBox(height: 10.h),
               BlocProvider(
                 create: (context) =>
@@ -295,10 +297,7 @@ class _ProductDetailsContent extends StatelessWidget {
                     BlocBuilder<ProductsInDetailsCubit, ProductsInDetailsState>(
                   builder: (context, state) {
                     if (state is ProductsInDetailsLoadingState) {
-                      return SizedBox(
-                          height: 225.h,
-                          child:
-                              const Center(child: CircularProgressIndicator()));
+                      return SizedBox(height:250.h,child: const ProductGridSkeleton(isHorizontal: true));
                     } else if (state is ProductsInDetailsSuccessState) {
                       final allProducts = state.productsModel.data?.data ?? [];
                       // Filter out the current product from similar products

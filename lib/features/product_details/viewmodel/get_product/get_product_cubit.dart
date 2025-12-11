@@ -10,7 +10,7 @@ class GetProductCubit extends Cubit<GetProductState> {
 
   GetProductCubit(this.productDetailsRepository) : super(GetProductInitial());
 
-  Future<void> getProduct(int productId, BuildContext context) async {
+  Future<void> getProduct(String productId, BuildContext context) async {
     emit(GetProductLoadingState());
 
     final result = await productDetailsRepository.getProduct(productId, context);

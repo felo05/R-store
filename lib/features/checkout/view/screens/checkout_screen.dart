@@ -9,10 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
-import 'package:get/route_manager.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
-import 'package:e_commerce/features/add_address/view/screens/map_screen.dart';
-import 'package:e_commerce/features/home/view/screens/main_screen.dart';
 
 import '../../repository/i_checkout_repository.dart';
 
@@ -73,7 +71,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           alignment: Alignment.center,
           child: InkWell(
             onTap: () {
-              Get.to(const LocationPickerScreen());
+              Navigator.pushNamed(context, AppRoutes.mapScreen);
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -234,7 +232,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ));
                   }
                   if (state is CheckoutSuccessState) {
-                    Get.offAll( const MainScreen(initialIndex: 0));
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      AppRoutes.home,
+                      (route) => false,
+                    );
                   }
                 },
                 builder: (context, state) {

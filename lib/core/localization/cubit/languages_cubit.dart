@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:meta/meta.dart';
 
 import '../../di/service_locator.dart';
@@ -37,13 +36,11 @@ class LanguageCubit extends Cubit<LanguageState> {
   }
 
   void toArabic() {
-    Get.updateLocale(const Locale("ar"));
     _storageService.setLanguage('ar');
     emit(SelectedLocale(_locale = const Locale('ar', '')));
   }
 
   void toEnglish() {
-    Get.updateLocale(const Locale("en"));
     _storageService.setLanguage('en');
     emit(SelectedLocale(_locale = const Locale('en', '')));
   }

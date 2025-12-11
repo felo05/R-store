@@ -2,6 +2,7 @@ import 'package:e_commerce/core/initialization/app_initializer.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
 import 'package:e_commerce/core/localization/cubit/languages_cubit.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/features/authnetication/login/view/screens/login_screen.dart';
 import 'package:e_commerce/features/cart/repository/i_cart_repository.dart';
 import 'package:e_commerce/features/cart/viewmodel/get_cart/cart_cubit.dart';
@@ -14,8 +15,8 @@ import 'package:e_commerce/features/home/viewmodel/products/products_cubit.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
+
+import '../../features/product_details/repository/i_product_details_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -89,18 +90,19 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               BlocProvider(
                 create: (context) =>
-                    CartCubit(sl<ICartRepository>())..getCart(context),
+                    CartCubit(sl<ICartRepository>(), sl<IProductDetailsRepository>())..getCart(context),
               ),
             ],
             child: BlocBuilder<LanguageCubit, LanguageState>(
               builder: (context, state) {
-                return GetMaterialApp(
+                return MaterialApp(
                   locale: state.locale,
                   localizationsDelegates:
                       AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   debugShowCheckedModeBanner: false,
                   home: nextScreen,
+                  onGenerateRoute: AppRoutes.generateRoute,
                 );
               },
             ),

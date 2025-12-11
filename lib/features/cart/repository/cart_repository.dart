@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/firebase_constants.dart';
 import '../../../core/services/i_error_handler_service.dart';
+import '../../../core/services/i_product_status_service.dart';
 import 'i_cart_repository.dart';
 
 class CartRepository implements ICartRepository {
   final IErrorHandlerService  _errorHandler;
+  final IProductStatusService _productStatusService;
 
-  CartRepository(this._errorHandler);
+  CartRepository(this._errorHandler, this._productStatusService);
 
   @override
   Future<Either<String, CartResponse>> getCartProducts(
@@ -25,15 +27,6 @@ class CartRepository implements ICartRepository {
           .collection(FirebaseConstants.cartCollection)
           .get();
 
-      // Get user's favorites
-      Set<String> favoriteIds = {};
-      final favoritesSnapshot = await FirebaseConstants.firestore
-          .collection(FirebaseConstants.usersCollection)
-          .doc(FirebaseConstants.currentUserId)
-          .collection(FirebaseConstants.favoritesCollection)
-          .get();
-
-      favoriteIds = favoritesSnapshot.docs.map((doc) => doc.id).toSet();
 
       final cartItems = snapshot.docs.map((doc) {
         final data = doc.data();
@@ -42,7 +35,7 @@ class CartRepository implements ICartRepository {
         if (data['product'] != null) {
           final productId = data['product']['id'] ?? doc.id;
           data['product']['id'] = productId; // Ensure product has id
-          data['product']['in_favorites'] = favoriteIds.contains(productId);
+          data['product']['in_favorites'] = _productStatusService.isInFavorite(productId);
           data['product']['in_cart'] = true; // Always true since it's in cart
         }
         return data;

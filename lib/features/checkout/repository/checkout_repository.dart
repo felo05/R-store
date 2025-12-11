@@ -9,11 +9,13 @@ import 'package:e_commerce/features/favorites/viewmodel/get_favorite_cubit.dart'
 import 'package:e_commerce/features/checkout/repository/i_checkout_repository.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
+import '../../../core/services/i_product_status_service.dart';
 
 class CheckoutRepository implements ICheckoutRepository {
   final IErrorHandlerService  _errorHandler;
+  final IProductStatusService _productStatusService;
 
-  CheckoutRepository(this._errorHandler);
+  CheckoutRepository(this._errorHandler, this._productStatusService);
 
   @override
   Future<Either<String, Unit>> checkout(
@@ -86,6 +88,7 @@ class CheckoutRepository implements ICheckoutRepository {
       for (var doc in cartSnapshot.docs) {
         await doc.reference.delete();
       }
+      _productStatusService.clearCart();
 
       // Refresh cart, products, and favorites to update inCart flags
       context.read<CartCubit>().getCart(context);

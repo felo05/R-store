@@ -1,60 +1,82 @@
 import 'package:dartz/dartz.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:e_commerce/features/search/repository/i_search_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/constants/firebase_constants.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
+import '../../../core/services/i_product_status_service.dart';
 
 class SearchRepository implements ISearchRepository {
   final IErrorHandlerService _errorHandler;
+  final IProductStatusService _productStatusService;
 
-  SearchRepository(this._errorHandler);
+  SearchRepository(this._errorHandler, this._productStatusService);
 
   @override
   Future<Either<String, BaseProductData>> search(
-      String query, BuildContext context) async {
+      String query, BuildContext context, {int? limit, dynamic lastDocument}) async {
     try {
-      final snapshot = await FirebaseConstants.firestore
-          .collection(FirebaseConstants.productsCollection)
-          .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
-          .get();
-
-      // Get user's favorites and cart if logged in
-      Set<String> favoriteIds = {};
-      Set<String> cartIds = {};
-
-      if (FirebaseConstants.currentUserId != null) {
-        // Fetch user's favorites
-        final favoritesSnapshot = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.favoritesCollection)
-            .get();
-
-        favoriteIds = favoritesSnapshot.docs.map((doc) => doc.id).toSet();
-
-        // Fetch user's cart
-        final cartSnapshot = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.cartCollection)
-            .get();
-
-        cartIds = cartSnapshot.docs.map((doc) => doc.id).toSet();
+      if (query.isEmpty) {
+        return Right(BaseProductData(data: [], lastDocument: null));
       }
 
-      final products = snapshot.docs.map((doc) {
-        final data = doc.data();
+      final searchQuery = query.toLowerCase().trim();
+
+      // Fetch all products from Firestore
+      Query queryRef = FirebaseConstants.firestore
+          .collection(FirebaseConstants.productsCollection);
+
+      final snapshot = await queryRef.get();
+
+      // Get user's favorites and cart status using centralized service
+      final statusMap = _productStatusService.getUserProductStatus();
+      final favoriteIds = statusMap['favorites']!;
+      final cartIds = statusMap['cart']!;
+
+      // Map all products
+      final allProducts = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
-        // Set inFavorites and inCart flags based on user's collections
         data['in_favorites'] = favoriteIds.contains(doc.id);
         data['in_cart'] = cartIds.contains(doc.id);
         return ProductData.fromJson(data);
       }).toList();
 
-      return Right(BaseProductData(data: products));
+      // Client-side filter: Keep only products where name CONTAINS the search query (case-insensitive)
+      final filteredProducts = allProducts.where((product) {
+        final productName = product.name?.toLowerCase() ?? '';
+        return productName.contains(searchQuery);
+      }).toList();
+
+      // Apply pagination to filtered results
+      int startIndex = 0;
+      if (lastDocument != null) {
+        // Find the index after the last document ID
+        final lastDocIndex = filteredProducts.indexWhere(
+          (p) => p.id.toString() == lastDocument.toString()
+        );
+        if (lastDocIndex != -1) {
+          startIndex = lastDocIndex + 1;
+        }
+      }
+
+      // Get paginated subset
+      final pageLimit = limit ?? 15;
+      final endIndex = (startIndex + pageLimit).clamp(0, filteredProducts.length);
+
+      final paginatedProducts = filteredProducts.sublist(startIndex, endIndex);
+
+      // Determine last document ID for next page
+      final lastDocId = paginatedProducts.isNotEmpty && endIndex < filteredProducts.length
+          ? paginatedProducts.last.id
+          : null;
+
+      return Right(BaseProductData(
+        data: paginatedProducts,
+        lastDocument: lastDocId,
+      ));
     } catch (e) {
       return Left(_errorHandler.errorHandler(e.toString(), context));
     }

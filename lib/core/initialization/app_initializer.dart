@@ -5,6 +5,8 @@ import 'package:e_commerce/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
+import '../services/i_product_status_service.dart';
+
 /// Result data from initialization
 class InitializationResult {
   final bool isFirstTime;
@@ -42,11 +44,9 @@ class AppInitializer {
     }
 
     try {
-      final stopwatch = Stopwatch()..start();
 
       // Phase 1: Critical initialization (Firebase must be first)
       await _initializeFirebase();
-      debugPrint('Firebase initialized in ${stopwatch.elapsedMilliseconds}ms');
 
       // Phase 2: Concurrent initialization of independent services
       // Service Locator and Storage can run in parallel
@@ -54,8 +54,9 @@ class AppInitializer {
         _initializeServiceLocatorWithScheduling(),
         _initializeStorageWithScheduling(),
       ]);
+      final result=await sl<IProductStatusService>().fetchFavoritesAndCart();
+      result.fold((error) => throw Exception(error), (_) => null);
 
-      debugPrint('Total initialization time: ${stopwatch.elapsedMilliseconds}ms');
 
       _isInitialized = true;
 

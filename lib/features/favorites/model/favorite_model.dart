@@ -21,6 +21,7 @@ class FavoriteModel {
 class FavoriteDataList {
   FavoriteDataList({
     this.data,
+    this.lastDocument,
   });
 
   FavoriteDataList.fromJson(dynamic json) {
@@ -30,9 +31,11 @@ class FavoriteDataList {
         data?.add(FavoriteData.fromJson(v));
       });
     }
+    lastDocument = json['lastDocument'];
   }
 
   List<FavoriteData>? data;
+  dynamic lastDocument; // For pagination
 }
 
 class FavoriteData {

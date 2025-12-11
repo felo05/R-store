@@ -13,10 +13,10 @@ dependencies:
   flutter_screenutil:
   flutter_bloc: ^8.1.6
   intl: ^0.20.2
-  get: ^4.6.6
   get_it: ^7.6.4
   hive: ^2.2.3
   dartz:
+  skeletonizer:
   hive_flutter: ^1.1.0
   geocoding:
   carousel_slider:

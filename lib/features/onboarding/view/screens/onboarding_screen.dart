@@ -1,11 +1,10 @@
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
-import 'package:get/get.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 
 import '../../../../core/di/service_locator.dart';
 import '../../../../core/services/i_storage_service.dart';
-import '../../../authnetication/login/view/screens/login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -74,9 +73,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 onboardingNumber == 2
                                     ? sl<IStorageService>().inFirstTime()
                                     : null;
-                                onboardingNumber < 3
-                                    ? onboardingNumber++
-                                    : Get.to(LoginScreen());
+                                if (onboardingNumber < 3) {
+                                  onboardingNumber++;
+                                } else {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.login,
+                                  );
+                                }
                               });
                             },
                           )))

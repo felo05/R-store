@@ -1,6 +1,7 @@
 import 'package:e_commerce/core/constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
+import 'package:e_commerce/core/widgets/skeleton_loaders.dart';
 import 'package:e_commerce/features/favorites/model/favorite_model.dart';
 import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,40 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> with AutomaticKeepAliveClientMixin {
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore) return;
+
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      final state = context.read<GetFavoriteCubit>().state;
+      if (state is GetFavoriteSuccessState) {
+        if (state.favoriteModel.data?.lastDocument != null) {
+          setState(() => _isLoadingMore = true);
+          context.read<GetFavoriteCubit>().loadMoreFavorites(context, state.favoriteModel).then((_) {
+            if (mounted) setState(() => _isLoadingMore = false);
+          });
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,16 +88,23 @@ class _FavoriteScreenState extends State<FavoriteScreen> with AutomaticKeepAlive
             child: Builder(
               builder: (context) {
                 if (state is GetFavoriteLoadingState) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: baseColor),
-                  );
+                  return const ProductGridSkeleton(itemCount: 6,isHorizontal: false,);
                 }
 
                 List<Widget> favoriteWidgets = [];
+                bool showLoadingMore = false;
 
-                if (state is GetFavoriteSuccessState) {
-                  final List<FavoriteData> products =
-                      state.favoriteModel.data?.data ?? [];
+                if (state is GetFavoriteSuccessState || state is GetFavoriteLoadingMoreState) {
+                  FavoriteModel favoriteModel;
+
+                  if (state is GetFavoriteSuccessState) {
+                    favoriteModel = state.favoriteModel;
+                  } else {
+                    favoriteModel = (state as GetFavoriteLoadingMoreState).currentData;
+                    showLoadingMore = true;
+                  }
+
+                  final List<FavoriteData> products = favoriteModel.data?.data ?? [];
 
                   if (products.isEmpty) {
                     favoriteWidgets.add(
@@ -79,7 +119,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> with AutomaticKeepAlive
                       ),
                     );
                   } else {
-                    favoriteWidgets = products.map((favoriteProduct) {
+                    favoriteWidgets = products.map<Widget>((favoriteProduct) {
                       return ProductCard(
                         isInHome: false,
                         product: favoriteProduct.product ?? ProductData(),
@@ -87,10 +127,23 @@ class _FavoriteScreenState extends State<FavoriteScreen> with AutomaticKeepAlive
                         reloadAll: false,
                       );
                     }).toList();
+
+                    // Add loading indicator at the bottom when loading more
+                    if (showLoadingMore) {
+                      favoriteWidgets.add(
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(
+                            child: CircularProgressIndicator(color: baseColor),
+                          ),
+                        ),
+                      );
+                    }
                   }
                 }
 
                 return ListView(
+                  controller: _scrollController,
                   padding: const EdgeInsets.all(16.0),
                   children: favoriteWidgets,
                 );

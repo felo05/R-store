@@ -3,13 +3,13 @@ import 'package:e_commerce/features/cart/model/cart_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
-import 'package:get/route_manager.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/features/cart/view/widgets/cart_product_card.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
-import 'package:e_commerce/features/checkout/view/screens/checkout_screen.dart';
 
 import '../../../../core/di/service_locator.dart';
+import '../../../product_details/repository/i_product_details_repository.dart';
 import '../../repository/i_cart_repository.dart';
 
 class CartScreen extends StatelessWidget {
@@ -18,7 +18,7 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CartCubit(sl<ICartRepository>())..getCart(context),
+      create: (context) => CartCubit(sl<ICartRepository>(), sl<IProductDetailsRepository>())..getCart(context),
       child: Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
@@ -93,8 +93,10 @@ class CartScreen extends StatelessWidget {
                   const Spacer(),
                   TextButton(
                     onPressed: total <= 0 || products.isEmpty ? null : () {
-                      Get.to(
-                        CheckoutScreen(
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.checkout,
+                        arguments: CheckoutArguments(
                           products: CartData(cartItems: products, total: total),
                         ),
                       );
@@ -159,12 +161,9 @@ class CartScreen extends StatelessWidget {
             cartItem: cartItem,
             onRemoveAll: (num removedTotal) {
               // Remove item using CartCubit method
-              context.read<CartCubit>().removeItem(cartItem.id);
+              context.read<CartCubit>().removeItem(cartItem.id, context);
             },
             onChange: (num changeAmount) {
-              // CartItemCard updates quantity locally and calls changeQuantityCloudly
-              // We need to sync the CartCubit state with the new total
-              // Since CartItemCard already updated Firebase, we just update the total here
               final currentState = context.read<CartCubit>().state;
               if (currentState is CartSuccessState) {
                 final currentItems = currentState.cartResponse.cartItems ?? [];

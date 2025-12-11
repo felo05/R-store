@@ -1,8 +1,7 @@
 import 'package:e_commerce/core/widgets/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import '../../../category_products/view/screens/category_products_screen.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import '../../models/categories_model.dart';
 import '../../../../core/widgets/custom_text.dart';
 
@@ -18,8 +17,14 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Get.to(CategoryProductsScreen(
-            title: category.name!, categoryID: category.id!.toInt()));
+        Navigator.pushNamed(
+          context,
+          AppRoutes.categoryProducts,
+          arguments: CategoryProductsArguments(
+            categoryId: category.id!.toInt(),
+            categoryName: category.name!,
+          ),
+        );
       },
       child: Card(
         shape: RoundedRectangleBorder(

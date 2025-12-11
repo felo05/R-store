@@ -1,3 +1,14 @@
+// Response wrapper for pagination
+class CategoriesResponse {
+  CategoriesResponse({
+    this.categories,
+    this.lastDocument,
+  });
+
+  List<CategoriesData>? categories;
+  dynamic lastDocument; // For pagination
+}
+
 class CategoriesModel {
   CategoriesModel({
     this.status,

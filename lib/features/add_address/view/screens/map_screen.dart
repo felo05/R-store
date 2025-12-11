@@ -1,14 +1,13 @@
 import 'package:e_commerce/core/constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:e_commerce/features/add_address/view/screens/complete_adding.dart';
 
 class LocationPickerScreen extends StatefulWidget {
   const LocationPickerScreen({Key? key}) : super(key: key);
@@ -190,10 +189,13 @@ class LocationPickerScreenState extends State<LocationPickerScreen> {
             heroTag: AppLocalizations.of(context)!.confirm_location,
             onPressed: () {
               if (_placeMark != null) {
-                Get.to( CompleteAddAddress(
-                  position: _selectedPosition,
-                  placeMark: _placeMark!,
-                ));
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.completeAddAddress,
+                  arguments: CompleteAddAddressArguments(
+                    position: _selectedPosition,
+                  ),
+                );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(

@@ -1,13 +1,11 @@
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/features/change_password/repository/i_change_password_repository.dart';
 import 'package:e_commerce/features/change_password/viewmodel/change_password_cubit.dart';
-import 'package:e_commerce/features/home/view/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
 import '../../../../core/localization/l10n/app_localizations.dart';
-import 'package:get/route_manager.dart';
-
+import '../../../../core/routes/app_routes.dart';
 import '../../../../core/constants/Kcolors.dart';
 import '../../../../core/widgets/custom_text.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -89,9 +87,11 @@ class ChangePasswordScreen extends StatelessWidget {
                       ));
                     }
                     if (state is ChangePasswordSuccessState) {
-                      Get.offAll( const MainScreen(
-                            initialIndex: 0,
-                          ));
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.home,
+                        (route) => false,
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                             AppLocalizations.of(context)!.password_changed),

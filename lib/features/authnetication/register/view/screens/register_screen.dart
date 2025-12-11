@@ -6,12 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
-import 'package:get/get.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
-import 'package:e_commerce/features/home/view/screens/main_screen.dart';
 import 'package:e_commerce/features/authnetication/register/viewmodel/register_cubit.dart';
 
-import '../../../login/view/screens/login_screen.dart';
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
@@ -69,7 +67,11 @@ class RegisterScreen extends StatelessWidget {
                         FocusScope.of(context).requestFocus(_phoneFocusNode);
                       },
                       validator: (inputText) {
-                        return inputText!.isEmail
+                        if (inputText == null || inputText.isEmpty) {
+                          return AppLocalizations.of(context)!.email_not_valid;
+                        }
+                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        return emailRegex.hasMatch(inputText)
                             ? null
                             : AppLocalizations.of(context)!.email_not_valid;
                       },
@@ -83,12 +85,14 @@ class RegisterScreen extends StatelessWidget {
                         FocusScope.of(context).requestFocus(_passFocusNode);
                       },
                       validator: (inputText) {
-                        if (inputText!.length == 11 &&
-                            inputText.isPhoneNumber) {
+                        if (inputText == null || inputText.isEmpty) {
+                          return AppLocalizations.of(context)!.phone_number_not_valid;
+                        }
+                        final phoneRegex = RegExp(r'^\+?[0-9]{10,15}$');
+                        if (inputText.length >= 10 && phoneRegex.hasMatch(inputText)) {
                           return null;
                         } else {
-                          return AppLocalizations.of(context)!
-                              .phone_number_not_valid;
+                          return AppLocalizations.of(context)!.phone_number_not_valid;
                         }
                       },
                       inputType: TextInputType.phone,
@@ -147,9 +151,11 @@ class RegisterScreen extends StatelessWidget {
                           );
                         }
                         if (state is RegisterSuccessState) {
-                          Get.offAll( const MainScreen(
-                                initialIndex: 0,
-                              ));
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            AppRoutes.home,
+                            (route) => false,
+                          );
                         }
                       },
                       builder: (context, state) {
@@ -202,7 +208,7 @@ class RegisterScreen extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Get.offAll( LoginScreen());
+                            Navigator.pushReplacementNamed(context, AppRoutes.login);
                           },
                           child: CustomText(
                             text: AppLocalizations.of(context)!.login,

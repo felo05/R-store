@@ -5,9 +5,9 @@ import 'package:e_commerce/core/widgets/custom_network_image.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
+import 'package:e_commerce/core/widgets/skeleton_loaders.dart';
 import 'package:e_commerce/features/home/repository/i_home_repository.dart';
 import 'package:e_commerce/features/profile/model/profile_model.dart';
-import 'package:e_commerce/features/search/view/screens/search_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +15,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:e_commerce/core/localization/cubit/languages_cubit.dart';
 import 'package:e_commerce/features/home/view/widgets/category_card.dart';
 import 'package:e_commerce/core/widgets/horizontal_products_header.dart';
 import 'package:e_commerce/features/cart/viewmodel/get_cart/cart_cubit.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 
 import '../../../../core/services/i_storage_service.dart';
 import '../../../favorites/viewmodel/get_favorite_cubit.dart';
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                   Container(
                     color: backgroundColor,
                     child: InkWell(
-                      onTap: () => Get.to(const SearchScreen()),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.search),
                       child: Padding(
                         padding:
                             EdgeInsets.only(right: 8.w, top: 5.h, left: 8.w),
@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                     ),
                   ),
                   HorizontalProductsHeader(
-                      text: AppLocalizations.of(context)!.categories),
+                      text: AppLocalizations.of(context)!.categories,onPressed: ()=>Navigator.pushNamed(context, AppRoutes.categoriesList)),
                   BlocConsumer<CategoriesCubit, CategoriesState>(
                     listener: (context, state) {
                       if (state is CategoriesErrorState) {
@@ -115,9 +115,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                     builder: (context, state) {
                       if (state is CategoriesLoadingState) {
                         return SizedBox(
-                          height: 225.h,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
+                          height: 235.h,
+                          child: GridView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 4,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10.w,
+                              mainAxisSpacing: 10.h,
+                              childAspectRatio: 0.6,
+                            ),
+                            itemBuilder: (context, index) => const CategoryCardSkeleton(),
+                          ),
                         );
                       } else if (state is CategoriesSuccessState) {
                         final categories = state.categories.data?.data ?? [];
@@ -179,11 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       },
                       builder: (context, state) {
                         if (state is BannerLoadingState) {
-                          return SizedBox(
-                            height: 170.h,
-                            child: const Center(
-                                child: CircularProgressIndicator()),
-                          );
+                          return const BannerSkeleton(height: 170);
                         } else if (state is BannerSuccessState) {
                           final banners = state.bannerModel.data ?? [];
                           return CarouselSlider(
@@ -233,6 +238,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                         EdgeInsets.symmetric(horizontal: 3.w, vertical: 5.h),
                     child: HorizontalProductsHeader(
                       text: AppLocalizations.of(context)!.best_deals,
+                      onPressed: () => Navigator.pushNamed(context, AppRoutes.productsList),
                     ),
                   ),
                   BlocConsumer<ProductsCubit, ProductsState>(
@@ -245,9 +251,8 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                     builder: (context, state) {
                       if (state is ProductsLoadingState) {
                         return SizedBox(
-                            height: 225.h,
-                            child: const Center(
-                                child: CircularProgressIndicator()));
+                            height: 500.h,
+                            child: const ProductGridSkeleton(itemCount: 4,isHorizontal: true,));
                       } else if (state is ProductsSuccessState) {
                         final products = state.productData.data ?? [];
                         return SizedBox(

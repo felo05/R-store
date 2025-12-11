@@ -1,6 +1,7 @@
 import 'package:e_commerce/core//constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/features/add_address/model/address_model.dart';
 import 'package:e_commerce/features/add_address/repository/i_add_address_repository.dart';
 import 'package:flutter/foundation.dart';
@@ -9,11 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
-import 'package:e_commerce/features/home/view/screens/main_screen.dart';
 import 'package:e_commerce/features/add_address/viewmodel/add_address_cubit.dart';
 
 
@@ -144,9 +143,11 @@ class CompleteAddAddress extends StatelessWidget {
                           ),
                         );
                       } else if (state is AddAddressSuccessState) {
-                        Get.offAll( const MainScreen(
-                              initialIndex: 2,
-                            ));
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRoutes.home,
+                          (route) => false,
+                        );
                       }
                     },
                     builder: (context, state) {

@@ -1,5 +1,4 @@
 import 'package:e_commerce/core/constants/kcolors.dart';
-import 'package:e_commerce/features/category_products/repository/i_category_products_repository.dart';
 import 'package:e_commerce/features/home/models/products_model.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
 import 'package:e_commerce/core/widgets/product_card.dart';
@@ -7,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/service_locator.dart';
-import '../../viewmodel/category_products_cubit.dart';
+import '../../repository/i_categories_repository.dart';
+import '../../viewmodel/category_products/category_products_cubit.dart';
 
 class CategoryProductsScreen extends StatelessWidget {
   const CategoryProductsScreen({
@@ -23,7 +23,7 @@ class CategoryProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          CategoryProductsCubit(sl<ICategoryProductsRepository>())..getProductsByCategory(categoryID, context),
+          CategoryProductsCubit(sl<ICategoriesRepository>())..getProductsByCategory(categoryID, context),
       child: Scaffold(
           appBar: BackAppBar(
             title: title,

@@ -1,5 +1,6 @@
 import 'package:e_commerce/core/constants/Kcolors.dart';
 import 'package:e_commerce/core/widgets/back_appbar.dart';
+import 'package:e_commerce/core/widgets/skeleton_loaders.dart';
 import 'package:e_commerce/features/orders/view/widgets/orders_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,8 +10,45 @@ import 'package:e_commerce/features/orders/model/orders_model.dart';
 
 import '../../viewmodel/get_orders_cubit.dart';
 
-class OrderScreen extends StatelessWidget {
+class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
+
+  @override
+  State<OrderScreen> createState() => _OrderScreenState();
+}
+
+class _OrderScreenState extends State<OrderScreen> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore) return;
+
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      final state = context.read<GetOrdersCubit>().state;
+      if (state is GetOrdersSuccessState) {
+        if (state.lastDocument != null) {
+          setState(() => _isLoadingMore = true);
+          context.read<GetOrdersCubit>().loadMoreOrders(context, state.orders, state.lastDocument).then((_) {
+            if (mounted) setState(() => _isLoadingMore = false);
+          });
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,17 +86,20 @@ class OrderScreen extends StatelessWidget {
 
   Widget _buildOrderContent(BuildContext context, GetOrdersState state) {
     if (state is GetOrdersLoadingState) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: const [
-          SizedBox(height: 200),
-          Center(child: CircularProgressIndicator(color: baseColor)),
-        ],
-      );
+      return const OrderListSkeleton(itemCount: 5);
     }
 
-    if (state is GetOrdersSuccessState) {
-      List<BaseOrders> orders = state.orders;
+    if (state is GetOrdersSuccessState || state is GetOrdersLoadingMoreState) {
+      List<BaseOrders> orders;
+      bool showLoadingMore = false;
+
+      if (state is GetOrdersSuccessState) {
+        orders = state.orders;
+      } else {
+        orders = (state as GetOrdersLoadingMoreState).currentOrders;
+        showLoadingMore = true;
+      }
+
       if (orders.isEmpty) {
         return ListView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -78,8 +119,19 @@ class OrderScreen extends StatelessWidget {
       }
 
       return ListView.builder(
-        itemCount: orders.length,
-        itemBuilder: (ctx, index) => OrderDetailsCard(order: orders[index]),
+        controller: _scrollController,
+        itemCount: orders.length + (showLoadingMore ? 1 : 0),
+        itemBuilder: (ctx, index) {
+          if (index == orders.length) {
+            return const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: CircularProgressIndicator(color: baseColor),
+              ),
+            );
+          }
+          return OrderDetailsCard(order: orders[index]);
+        },
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 8.0),
       );

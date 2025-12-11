@@ -1,16 +1,14 @@
 import 'package:e_commerce/features/authnetication/login/viewmodel/login_cubit.dart';
-import 'package:e_commerce/features/authnetication/register/view/screens/register_screen.dart';
 import 'package:e_commerce/features/authnetication/repository/i_authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
-import 'package:get/get.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:e_commerce/core/widgets/custom_text_field.dart';
 import 'package:e_commerce/core/widgets/login_and_register_header.dart';
-import 'package:e_commerce/features/home/view/screens/main_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -50,7 +48,13 @@ class LoginScreen extends StatelessWidget {
                           text: AppLocalizations.of(context)!.email_or_phone_number,
                           controller: _emailController,
                           validator: (inputText) {
-                            if (!(inputText!.isEmail || inputText.isPhoneNumber)) {
+                            if (inputText == null || inputText.isEmpty) {
+                              return AppLocalizations.of(context)!.invalid_email_or_phone;
+                            }
+                            // Simple email/phone validation
+                            final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                            final phoneRegex = RegExp(r'^\+?[0-9]{10,15}$');
+                            if (!(emailRegex.hasMatch(inputText) || phoneRegex.hasMatch(inputText))) {
                               return AppLocalizations.of(context)!.invalid_email_or_phone;
                             }
                             return null;
@@ -110,7 +114,11 @@ class LoginScreen extends StatelessWidget {
                       ));
                     }
                     if (state is LoginSuccessState) {
-                      Get.offAll(   const MainScreen(initialIndex: 0,));
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.home,
+                        (route) => false,
+                      );
                     }
                   },
                   builder: (context, state) {
@@ -158,7 +166,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.offAll(RegisterScreen());
+                        Navigator.pushReplacementNamed(context, AppRoutes.register);
                       },
                       child: CustomText(
                         text: AppLocalizations.of(context)!.signup,

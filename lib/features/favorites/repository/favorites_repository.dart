@@ -7,44 +7,52 @@ import 'package:e_commerce/core/constants/firebase_constants.dart';
 import 'package:e_commerce/features/favorites/repository/i_favorites_repository.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
+import '../../../core/services/i_product_status_service.dart';
 
 class FavoritesRepository implements IFavoritesRepository {
   final IErrorHandlerService  _errorHandler;
+  final IProductStatusService _productStatusService;
 
-  FavoritesRepository(this._errorHandler);
+  FavoritesRepository(this._errorHandler, this._productStatusService);
 
   @override
-  Future<Either<String, FavoriteModel>> getFavorites(BuildContext context) async{
+  Future<Either<String, FavoriteModel>> getFavorites(BuildContext context, {int? limit, dynamic lastDocument}) async{
     try {
       if (FirebaseConstants.currentUserId == null) {
         return Left(_errorHandler.errorHandler('User not logged in',context));
       }
 
-      final snapshot = await FirebaseConstants.firestore
+      // Build query with pagination
+      Query query = FirebaseConstants.firestore
           .collection(FirebaseConstants.usersCollection)
           .doc(FirebaseConstants.currentUserId)
           .collection(FirebaseConstants.favoritesCollection)
-          .get();
+          .orderBy('addedAt', descending: true);
 
-      // Get user's cart
-      Set<String> cartIds = {};
-      final cartSnapshot = await FirebaseConstants.firestore
-          .collection(FirebaseConstants.usersCollection)
-          .doc(FirebaseConstants.currentUserId)
-          .collection(FirebaseConstants.cartCollection)
-          .get();
+      // Apply pagination if limit is provided
+      if (limit != null) {
+        query = query.limit(limit);
+      }
 
-      cartIds = cartSnapshot.docs.map((doc) => doc.id).toSet();
+      // If lastDocument is provided, start after it
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      final snapshot = await query.get();
+
 
       final favorites = snapshot.docs.map((doc) {
-        final data = doc.data();
+        final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
         // Update product data with correct flags and ensure id is set
-        if (data['product'] != null) {
-          final productId = data['product']['id'] ?? doc.id;
-          data['product']['id'] = productId; // Ensure product has id
-          data['product']['in_favorites'] = true; // Always true since it's in favorites
-          data['product']['in_cart'] = cartIds.contains(productId);
+        if (data['product'] != null && data['product'] is Map) {
+          final product = data['product'] as Map<String, dynamic>;
+          final productId = product['id'] ?? doc.id;
+          product['id'] = productId; // Ensure product has id
+          product['in_favorites'] = true; // Always true since it's in favorites
+          product['in_cart'] = _productStatusService.isInCart(productId);
+          data['product'] = product;
         }
         return FavoriteData.fromJson(data);
       }).toList();
@@ -54,6 +62,7 @@ class FavoritesRepository implements IFavoritesRepository {
         message: null,
         data: FavoriteDataList(
           data: favorites,
+          lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
         ),
       ));
     }catch(e){
@@ -77,6 +86,7 @@ class FavoritesRepository implements IFavoritesRepository {
 
       if (doc.exists) {
         // Remove from favorites
+         _productStatusService.removeProductFromFavorites(productID);
         await favRef.delete();
       } else {
         // Add to favorites
@@ -92,6 +102,8 @@ class FavoritesRepository implements IFavoritesRepository {
             'addedAt': FieldValue.serverTimestamp(),
           });
         }
+         _productStatusService.addProductToFavorites(productID);
+
       }
     } catch (e) {
       if (kDebugMode) {

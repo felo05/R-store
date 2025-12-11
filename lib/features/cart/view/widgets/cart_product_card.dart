@@ -3,10 +3,9 @@ import 'package:e_commerce/features/product_details/viewmodel/add_to_cart/add_to
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 
 import '../../viewmodel/get_cart/cart_cubit.dart';
-import '../../../product_details/view/screens/product_details_screen.dart';
 import '../../../../core/localization/l10n/app_localizations.dart';
 import '../../../../core/widgets/custom_network_image.dart';
 import '../../../../core/widgets/custom_text.dart';
@@ -46,7 +45,14 @@ class _CartItemCardState extends State<CartItemCard> {
       elevation: 3,
       child: GestureDetector(
         onTap: () {
-          Get.to(ProductDetailsScreen(product: widget.cartItem.product));
+          Navigator.pushNamed(
+            context,
+            AppRoutes.productDetails,
+            arguments: ProductDetailsArguments(
+              product: widget.cartItem.product,
+              productId: widget.cartItem.product.id,
+            ),
+          );
         },
         child: Padding(
           padding: EdgeInsets.all(10.w),

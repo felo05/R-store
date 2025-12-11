@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:e_commerce/features/orders/model/orders_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,26 +14,41 @@ class OrdersRepository implements IOrdersRepository {
   OrdersRepository(this._errorHandler);
 
   @override
-  Future<Either<String, List<BaseOrders>>> getOrders(BuildContext context) async{
+  Future<Either<String, OrdersResponse>> getOrders(BuildContext context, {int? limit, dynamic lastDocument}) async{
     try {
       if (FirebaseConstants.currentUserId == null) {
         return Left(_errorHandler.errorHandler('User not logged in', context));
       }
 
-      final snapshot = await FirebaseConstants.firestore
+      // Build query with pagination
+      Query query = FirebaseConstants.firestore
           .collection(FirebaseConstants.usersCollection)
           .doc(FirebaseConstants.currentUserId)
           .collection(FirebaseConstants.ordersCollection)
-          .orderBy('createdAt', descending: true)
-          .get();
+          .orderBy('createdAt', descending: true);
+
+      // Apply pagination if limit is provided
+      if (limit != null) {
+        query = query.limit(limit);
+      }
+
+      // If lastDocument is provided, start after it
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      final snapshot = await query.get();
 
       final orders = snapshot.docs.map((doc) {
-        final data = doc.data();
+        final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
         return BaseOrders.fromJson(data);
       }).toList();
 
-      return Right(orders);
+      return Right(OrdersResponse(
+        orders: orders,
+        lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
+      ));
     }catch(e){
       return Left(_errorHandler.errorHandler(e.toString(),context));
     }

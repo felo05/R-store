@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/screens/splash_screen.dart';
+import 'core/routes/app_routes.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }

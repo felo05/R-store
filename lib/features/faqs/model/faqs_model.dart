@@ -1,3 +1,14 @@
+// Response wrapper for pagination
+class FAQSResponse {
+  FAQSResponse({
+    this.faqs,
+    this.lastDocument,
+  });
+
+  List<QuestionsData>? faqs;
+  dynamic lastDocument; // For pagination
+}
+
 class FAQSModel {
   FAQSModel({
     this.status,

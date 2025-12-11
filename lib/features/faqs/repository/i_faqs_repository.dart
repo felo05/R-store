@@ -4,6 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 
 abstract class IFAQSRepository {
-  Future<Either<String,List<QuestionsData>>> getFaqs(BuildContext context);
+  Future<Either<String,FAQSResponse>> getFaqs(BuildContext context, {int? limit, dynamic lastDocument});
 }
 

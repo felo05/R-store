@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dartz/dartz.dart';
+import 'package:e_commerce/core/services/i_product_status_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce/features/profile/model/profile_model.dart';
@@ -13,8 +14,8 @@ import 'package:e_commerce/features/authnetication/repository/i_authentication_r
 class AuthenticationRepository implements IAuthenticationRepository {
   final IStorageService _storageService;
   final IErrorHandlerService _errorHandlerService;
-
-  AuthenticationRepository(this._storageService, this._errorHandlerService);
+  final IProductStatusService _productStatusService;
+  AuthenticationRepository(this._storageService, this._errorHandlerService, this._productStatusService);
 
   @override
   Future<Either<String, ProfileModel>> login(
@@ -45,7 +46,7 @@ class AuthenticationRepository implements IAuthenticationRepository {
         image: userData['image'],
         token: userCredential.user!.uid,
       );
-
+      _productStatusService.fetchFavoritesAndCart();
       return Right(ProfileModel(
         status: true,
         message: 'Login successful',

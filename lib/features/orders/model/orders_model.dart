@@ -1,5 +1,16 @@
 import 'package:e_commerce/features/add_address/model/address_model.dart';
 
+// Response wrapper for pagination
+class OrdersResponse {
+  OrdersResponse({
+    this.orders,
+    this.lastDocument,
+  });
+
+  List<BaseOrders>? orders;
+  dynamic lastDocument; // For pagination
+}
+
 class OrdersModel {
   OrdersModel({
     this.status,

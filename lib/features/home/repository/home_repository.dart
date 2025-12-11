@@ -10,11 +10,13 @@ import 'package:e_commerce/core/constants/firebase_constants.dart';
 import 'package:e_commerce/features/home/repository/i_home_repository.dart';
 
 import '../../../core/services/i_error_handler_service.dart';
+import '../../../core/services/i_product_status_service.dart';
 
 class HomeRepository implements IHomeRepository {
   final IErrorHandlerService  _errorHandler;
+  final IProductStatusService _productStatusService;
 
-  HomeRepository(this._errorHandler);
+  HomeRepository(this._errorHandler, this._productStatusService);
 
   @override
   Future<Either<String, BannerModel>> getBanners(BuildContext context) async{
@@ -39,7 +41,7 @@ class HomeRepository implements IHomeRepository {
   Future<Either<String, CategoriesModel>> getCategories(BuildContext context) async{
     try{
       final snapshot = await FirebaseConstants.firestore
-          .collection(FirebaseConstants.categoriesCollection)
+          .collection(FirebaseConstants.categoriesCollection).limit(4)
           .get();
 
       final categories = snapshot.docs.map((doc) => doc.data()).toList();
@@ -61,32 +63,13 @@ class HomeRepository implements IHomeRepository {
   Future<Either<String, BaseProductData>> getProducts(BuildContext context)async {
     try{
       final snapshot = await FirebaseConstants.firestore
-          .collection(FirebaseConstants.productsCollection)
+          .collection(FirebaseConstants.productsCollection).limit(5)
           .get();
 
-      // Get user's favorites and cart if logged in
-      Set<String> favoriteIds = {};
-      Set<String> cartIds = {};
-
-      if (FirebaseConstants.currentUserId != null) {
-        // Fetch user's favorites
-        final favoritesSnapshot = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.favoritesCollection)
-            .get();
-
-        favoriteIds = favoritesSnapshot.docs.map((doc) => doc.id).toSet();
-
-        // Fetch user's cart
-        final cartSnapshot = await FirebaseConstants.firestore
-            .collection(FirebaseConstants.usersCollection)
-            .doc(FirebaseConstants.currentUserId)
-            .collection(FirebaseConstants.cartCollection)
-            .get();
-
-        cartIds = cartSnapshot.docs.map((doc) => doc.id).toSet();
-      }
+      // Get user's favorites and cart status using centralized service
+      final statusMap = _productStatusService.getUserProductStatus();
+      final favoriteIds = statusMap['favorites']!;
+      final cartIds = statusMap['cart']!;
 
       final products = snapshot.docs.map((doc) {
         final data = doc.data();

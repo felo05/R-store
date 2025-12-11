@@ -4,14 +4,12 @@ import 'package:e_commerce/core/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 
 import '../../../../core/constants/kcolors.dart';
 import '../../../cart/viewmodel/get_cart/cart_cubit.dart';
 import '../../../../core/localization/l10n/app_localizations.dart';
 import '../../../favorites/viewmodel/get_favorite_cubit.dart';
-import '../../../home/view/screens/main_screen.dart';
 import '../../../home/viewmodel/products/products_cubit.dart';
 
 class AddToCartBottomNavigation extends StatefulWidget {
@@ -149,7 +147,11 @@ class AddToCartBottomNavigationState extends State<AddToCartBottomNavigation> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6),
       child: GestureDetector(
         onTap: () {
-          Get.offAll(const MainScreen(initialIndex: 2));
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.home,
+            (route) => false,
+          );
         },
         child: Container(
           width: double.infinity,

@@ -27,23 +27,30 @@ import 'package:e_commerce/features/authnetication/repository/authentication_rep
 
 import '../../features/add_address/repository/i_add_address_repository.dart';
 import '../../features/add_address/repository/add_address_repository.dart';
-import '../../features/category_products/repository/i_category_products_repository.dart';
-import '../../features/category_products/repository/category_products_repository.dart';
+import '../../features/categories/repository/categories_repository.dart';
+import '../../features/categories/repository/i_categories_repository.dart';
+import '../../features/products_list/repository/i_product_list_repository.dart';
+import '../../features/products_list/repository/product_list_repository.dart';
 import '../../core/services/i_storage_service.dart';
 import '../../core/services/storage_service.dart';
 import '../services/error_handler_service.dart';
 import '../services/i_error_handler_service.dart';
+import '../services/i_product_status_service.dart';
+import '../services/product_status_service.dart';
 
 final sl = GetIt.instance;
 
 Future<void> initServiceLocator() async {
   // ==================== Core Services ====================
 
-  // Storage Service - Singleton (returns the same instance)
+  // Storage Service - Singleton
   sl.registerLazySingleton<IStorageService>(() => StorageService());
 
   // Error Handler Service - Singleton
   sl.registerLazySingleton<IErrorHandlerService>(() => ErrorHandlerService());
+
+  // Product Status Service - Singleton
+  sl.registerLazySingleton<IProductStatusService>(() => ProductStatusService());
 
   // Language Cubit - Singleton
   sl.registerLazySingleton<LanguageCubit>(() => LanguageCubit());
@@ -52,29 +59,29 @@ Future<void> initServiceLocator() async {
 
   // Home Repository
   sl.registerLazySingleton<IHomeRepository>(
-        () => HomeRepository(sl<IErrorHandlerService>()),
+        () => HomeRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Favorites Repository
   sl.registerLazySingleton<IFavoritesRepository>(
-        () => FavoritesRepository(sl<IErrorHandlerService>()),
+        () => FavoritesRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Product Details Repository
   sl.registerLazySingleton<IProductDetailsRepository>(
-        () => ProductDetailsRepository(sl<IErrorHandlerService>()),
+        () => ProductDetailsRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Cart Repository
   sl.registerLazySingleton<ICartRepository>(
-        () => CartRepository(sl<IErrorHandlerService>()),
+        () => CartRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Authentication Repository
   sl.registerLazySingleton<IAuthenticationRepository>(
         () =>
         AuthenticationRepository(
-            sl<IStorageService>(), sl<IErrorHandlerService>()),
+            sl<IStorageService>(), sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Logout Repository
@@ -102,12 +109,12 @@ Future<void> initServiceLocator() async {
 
   // Checkout Repository
   sl.registerLazySingleton<ICheckoutRepository>(
-        () => CheckoutRepository(sl<IErrorHandlerService>()),
+        () => CheckoutRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Search Repository
   sl.registerLazySingleton<ISearchRepository>(
-        () => SearchRepository(sl<IErrorHandlerService>()),
+        () => SearchRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // FAQs Repository
@@ -116,13 +123,18 @@ Future<void> initServiceLocator() async {
   );
 
   // Category Products Repository
-  sl.registerLazySingleton<ICategoryProductsRepository>(
-        () => CategoryProductsRepository(sl<IErrorHandlerService>()),
+  sl.registerLazySingleton<ICategoriesRepository>(
+        () => CategoriesRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
   // Add Address Repository
   sl.registerLazySingleton<IAddAddressRepository>(
         () => AddAddressRepository(sl<IErrorHandlerService>()),
+  );
+
+  // Products List Repository
+  sl.registerLazySingleton<IProductsListRepository>(
+        () => ProductsListRepository(sl<IErrorHandlerService>(), sl<IProductStatusService>()),
   );
 
 }

@@ -2,22 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce/core/constants/kcolors.dart';
 import 'package:e_commerce/core/constants/firebase_constants.dart';
 import 'package:e_commerce/core/widgets/custom_text.dart';
-import 'package:e_commerce/features/orders/repository/i_orders_repository.dart';
-import 'package:e_commerce/features/orders/view/screens/orders_screen.dart';
 import 'package:e_commerce/features/profile/model/profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/core/di/service_locator.dart';
 import 'package:e_commerce/core/localization/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:e_commerce/features/authnetication/login/view/screens/login_screen.dart';
-import 'package:e_commerce/features/faqs/view/screens/faqs_screen.dart';
-import 'package:e_commerce/features/orders/viewmodel/get_orders_cubit.dart';
+import 'package:e_commerce/core/routes/app_routes.dart';
 
 import '../../../../core/services/i_storage_service.dart';
-import '../../../change_password/view/screens/change_password_screen.dart';
-import '../../../edit_profile/view/screens/edit_profile_screen.dart';
 import '../../repository/i_logout_repository.dart';
 import '../../viewmodel/logout_cubit.dart';
 
@@ -181,7 +174,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: 5.h),
                     _profileRow(
                         onTap: () async {
-                          final result = await Get.to(EditProfileScreen(user: displayUser));
+                          final result = await Navigator.pushNamed(
+                            context,
+                            AppRoutes.editProfile,
+                            arguments: EditProfileArguments(user: displayUser),
+                          );
                           if (result == true) {
                             _loadUserData(); // Refresh data after edit
                           }
@@ -190,22 +187,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.edit_calendar_outlined),
                     _profileRow(
                         onTap: () {
-                          Get.to( ChangePasswordScreen());
+                          Navigator.pushNamed(context, AppRoutes.changePassword);
                         },
                         icon: Icons.lock_outline_rounded,
                         text: AppLocalizations.of(context)!.change_password),
                     _profileRow(
                         onTap: () {
-                          Get.to( BlocProvider(
-                              create: (BuildContext context) =>
-                                  GetOrdersCubit(sl<IOrdersRepository>())..getOrders(context),
-                              child: const OrderScreen()));
+                          Navigator.pushNamed(context, AppRoutes.orders);
                         },
                         icon: Icons.local_shipping_outlined,
                         text: AppLocalizations.of(context)!.my_orders),
                     _profileRow(
                         onTap: () {
-                          Get.to( const FAQSScreen());
+                          Navigator.pushNamed(context, AppRoutes.faqs);
                         },
                         icon: Icons.help_outline,
                         text: AppLocalizations.of(context)!.faqs),
@@ -248,7 +242,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             },
                             listener: (BuildContext context, LogoutState state) {
                               if (state is LogoutSuccessState) {
-                                Get.offAll(() => LoginScreen());
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  AppRoutes.login,
+                                  (route) => false,
+                                );
                               }
                               if (state is LogoutErrorState) {
                                 ScaffoldMessenger.of(context).showSnackBar(

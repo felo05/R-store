@@ -7,6 +7,12 @@ final class GetFavoriteInitial extends GetFavoriteState {}
 
 final class GetFavoriteLoadingState extends GetFavoriteState {}
 
+final class GetFavoriteLoadingMoreState extends GetFavoriteState {
+  final FavoriteModel currentData;
+
+  GetFavoriteLoadingMoreState(this.currentData);
+}
+
 final class GetFavoriteErrorState extends GetFavoriteState {
   final String msg;
 

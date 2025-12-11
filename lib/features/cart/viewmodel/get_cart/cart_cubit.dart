@@ -3,12 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/features/cart/model/cart_model.dart';
 
+import '../../../product_details/repository/i_product_details_repository.dart';
+
 part 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
   final ICartRepository cartRepository;
+  final IProductDetailsRepository productDetailsRepository;
 
-  CartCubit(this.cartRepository) : super(CartInitial());
+  CartCubit(this.cartRepository,  this.productDetailsRepository) : super(CartInitial());
 
   void getCart(BuildContext context) async {
     emit(CartLoadingState());
@@ -61,12 +64,12 @@ class CartCubit extends Cubit<CartState> {
   }
 
   /// Remove item from cart and recalculate total
-  void removeItem(String productId) {
+  void removeItem(String productId,BuildContext context) {
     final currentState = state;
     if (currentState is CartSuccessState) {
       final cartItems = currentState.cartResponse.cartItems ?? [];
       final updatedItems = cartItems.where((item) => item.id != productId).toList();
-
+      productDetailsRepository.deleteFromCart(productId, context);
       // Recalculate total
       num newTotal = 0;
       for (var item in updatedItems) {

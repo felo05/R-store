@@ -18,7 +18,7 @@ class ProductsModel {
 class BaseProductData {
   BaseProductData({
     this.data,
-
+    this.lastDocument,
   });
 
   BaseProductData.fromJson(dynamic json) {
@@ -28,10 +28,10 @@ class BaseProductData {
         data?.add(ProductData.fromJson(v));
       });
     }
-
+    lastDocument = json['lastDocument'];
   }
   List<ProductData>? data;
-
+  dynamic lastDocument; // For pagination
 }
 
 class ProductData {
@@ -60,7 +60,7 @@ class ProductData {
     inFavorites = json['in_favorites'];
     inCart = json['in_cart'];
   }
-  dynamic id; // Changed to dynamic to support both num and String (Firestore document ID)
+  String? id; // Changed to dynamic to support both num and String (Firestore document ID)
   num? price;
   num? oldPrice;
   num? discount;

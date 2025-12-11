@@ -4,6 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 
 abstract class IOrdersRepository {
-  Future<Either<String,List<BaseOrders>>> getOrders(BuildContext context);
+  Future<Either<String,OrdersResponse>> getOrders(BuildContext context, {int? limit, dynamic lastDocument});
 }
 

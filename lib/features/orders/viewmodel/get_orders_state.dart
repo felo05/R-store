@@ -13,7 +13,15 @@ final class GetOrdersErrorState extends GetOrdersState {
 
 final class GetOrdersLoadingState extends GetOrdersState {}
 
+final class GetOrdersLoadingMoreState extends GetOrdersState {
+  final List<BaseOrders> currentOrders;
+
+  GetOrdersLoadingMoreState(this.currentOrders);
+}
+
 final class GetOrdersSuccessState extends GetOrdersState {
   final List<BaseOrders> orders;
-  GetOrdersSuccessState(this.orders);
+  final dynamic lastDocument;
+
+  GetOrdersSuccessState(this.orders, this.lastDocument);
 }
